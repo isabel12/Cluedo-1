@@ -1,24 +1,64 @@
 package CommandLine;
 
+import java.io.IOException;
+import java.util.InputMismatchException;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
+
+import CluedoGame.CluedoGame;
 
 
 public class CMDGame {
 
 	public static void main(String[] args) {
-		//first ask how many players we want
-		
 		System.out.println("Welcome to Cluedo!\n");
-		System.out.println("How many players want to play?");
 		
+		//construct the game object
+		CluedoGame game = new CluedoGame(getNumberPlayers());
+
+		System.out.println("Starting a new game of Cluedo!");
+		
+		//play a real game now
+		startGame(game);
+	}
+
+
+	/**
+	 * Plays a command line based game of cluedo given the current game object.
+	 * 
+	 * @param game the game we wish to play
+	 */
+	public static void startGame(CluedoGame game) {
+		
+		// lots of game logic here
+	}
+	
+	
+	/**
+	 * Prompts the users and returns a number between 3 - 6 inclusive.
+	 * 
+	 * @return number of players
+	 */
+	private static int getNumberPlayers() {
 		Scanner scan = new Scanner(System.in);
+		int number = 0;
+
+		System.out.println("How many people want to play?");
 		
-		int numPlayers = scan.nextInt();
+		do {	
+			System.out.println("Number must be between 3 and 6 inclusive.");
+			
+			try {
+				number = scan.nextInt();
+			} catch (InputMismatchException e) {
+				//default to a value which will cause loop to iterate again
+				number = 0;
+				//get rid of scanner data so it doesn't block
+				scan.skip(".*");
+			}
+		} while (number < 3 || number > 6);
 		
-		//construct the game objects
-		//CluedoGame game = new CluedoGame(numPlayers);
-		
-		System.out.println("Starting game with " + numPlayers + " players!");
-		
+		scan.close();
+		return number;
 	}
 }
