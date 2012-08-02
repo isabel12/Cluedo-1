@@ -4,7 +4,6 @@ public class Cell {
 	// Set<Cell> neighbours
 	// boolean isEmpty
 	// Position
-	// edited by Troy
 	
 	
 }
