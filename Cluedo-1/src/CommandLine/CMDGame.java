@@ -1,8 +1,6 @@
 package CommandLine;
 
-import java.io.IOException;
 import java.util.InputMismatchException;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import CluedoGame.CluedoGame;
