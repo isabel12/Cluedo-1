@@ -11,6 +11,8 @@ public class Cell {
 	// boolean isEmpty
 	// Position
 	
-	// test to see if working
+	public static void main(String[] args) {
+		System.out.println("Hello, world!");
+	}
 	
 }
