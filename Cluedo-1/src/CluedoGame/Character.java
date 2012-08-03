@@ -1,12 +1,13 @@
 package CluedoGame;
 
 public enum Character {
-	DianeWhite("Diane White"),
-	EleanorPeacock("Eleanor Peacock"),
-	JackMustard("Jack Mustard"),
-	JacobGreen("Jacob Green"),
-	KasandraScarlett("Kasandra Scarlett"),
-	VictorPlum("Victor Plum");
+	
+	Scarlett("Kasandra Scarlett"),
+	Mustard("Jack Mustard"),
+	White("Diane White"),
+	Green("Jacob Green"),
+	Peacock("Eleanor Peacock"),
+	Plum("Victor Plum");
 
 	private final String name;
 
