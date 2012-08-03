@@ -31,18 +31,18 @@ public class CMDGame {
 		String command;
 		// lots of game logic here
 		
-		while (game.hasNotEnded()) {
+		//while (game.hasNotEnded()) 
 			
 			//get player
 			//print instructions
 			
-			while (game.isTurn(player)) {
+			//while (game.isTurn(player)) 
 				
 				
 				
 				
-			}
-		}
+			
+
 		
 	}
 	
