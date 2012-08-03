@@ -1,0 +1,69 @@
+25 29
+
+SSSSSS5.TTTTT.LLLLLL6.OOO
+SSSSSS..TTTTT?LLLLLL..OOO
+SSSSSS..TTTTT.LLLLLL..OOO
+SSSSSS..TTTTT.LLLLLL..OOO
+SSSSSS.?TTTTT.LLLLLL..OOO
+SSSSSS..TTTTT.LLLLLL..OOO
+SSSSSs..TTTTTlLLLLLL.?OOO
+SSSSS...TTTTT.LLLLLL..OOO
+...?......t....LLL...oOOO
+4..........?....l........
+PPPP.p........w.?.....h..
+PPPPPPPP..WWWWWWWW.HHHHHH
+PPPPPPPPp.WWWWWWWW.HHHHHH
+PPPPPPPP..WWWWWWWWhHHHHHH
+PPPPPPPP?.WWWWWWWWhHHHHHH
+PPPPPPPP..WWWWWWWW.HHHHHH
+PPPPPPPPp.WWWWWWWW.HHHHHH
+PPPPPPPP..w...?..w.HHHHHH
+PPPP?p......d.......?....
+3.........DDDDDD.........
+..........DDDDDD....gGGGG
+KKKKKKk...DDDDDDd...GGGGG
+KKKKKKK...DDDDDD..?.GGGGG
+KKKKKKK.?DDDDDDDD...GGGGG
+KKKKKKK..DDDDDDDD...GGGGG
+KKKKKKK..DDDDDDDD...GGGGG
+KKKKKKK..DDDDDDDD...GGGGG
+KKKKKKK..DDDDDDDD...GGGGG
+KKKKKKK2.DDDDDDDD.1.GGGGG
+
+
+
+
+25 by 29
+
+Key 
+===
+
+Rooms (entrance square lower case)
+-----
+
+s = spa
+t = theatre
+l = living room
+o = observatory
+p = patio
+h = hall
+k = kitchen
+d = dining room
+g = guest house
+w = swimming pool
+
+
+
+Corridor (movable squares)
+--------------------------
+? = question mark square
+. = moveable square	(players can walk here)
+
+6 player start positions:
+
+6 = Victor Plum
+5 = Eleanor Peacock
+4 = Jacob Green
+3 = Diane White
+2 = Jack Mustard
+1 = Kasandra Scarlett
