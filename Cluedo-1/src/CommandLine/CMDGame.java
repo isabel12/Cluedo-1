@@ -27,8 +27,23 @@ public class CMDGame {
 	 * @param game the game we wish to play
 	 */
 	public static void startGame(CluedoGame game) {
-		
+		Scanner scan = new Scanner(System.in);
+		String command;
 		// lots of game logic here
+		
+		while (game.hasNotEnded()) {
+			
+			//get player
+			//print instructions
+			
+			while (game.isTurn(player)) {
+				
+				
+				
+				
+			}
+		}
+		
 	}
 	
 	

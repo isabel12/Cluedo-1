@@ -1,4 +1,4 @@
-package cluedoGame;
+package CluedoGame;
 
 import java.util.List;
 
