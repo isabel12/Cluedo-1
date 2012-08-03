@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -25,29 +26,33 @@ public class Board {
 	//-----------
 	Cell[][] map; // a 2D array of Cell objects representing the map.  Every box will contain a Cell, although room cells will be duplicated.
 	Map<Character, Cell> startingCells;  // a map to keep track of where characters start.  I won't make a new type of Cell for now.
-
+	
+	// dimensions of the board
+	int cols; 
+	int rows;
 
 	// player info
 	//------------
 	Set<Character> players; // a set of the characters on the board
-	Map<Character, Cell> playerPos;
+	Map<Character, Cell> playerPos; // <---------- Still not super sure about this implementation yet
 
 
-
+	
+	
 	public Board(){
-
-
+		this.playerPos = new HashMap<Character, Cell>();
+		this.startingCells =new HashMap<Character, Cell>();
 	}
 
 
-
+	//=============================================================================================
+	// Moving/path methods
+	//=============================================================================================
 
 
 
 	//dunno about return types for move() methods yet
 	//just initial planning
-
-
 	/**
 	 * Moves character in given direction by one square. 
 	 * 
@@ -73,8 +78,10 @@ public class Board {
 		}
 	}
 
-	/**
-	 * Move character to given x, y locations, using the A* algorithm.
+	
+	//	QUESTION: should the paramters be a Point, instead of ints?
+	/** 
+	 * Move character to given x, y locations (or as close as possible) using the A* algorithm.
 	 * 
 	 * @param chara
 	 * @param x
@@ -93,6 +100,9 @@ public class Board {
 		for (Direction d: path) move(chara, d);
 	}
 
+	
+	
+	//QUESTION: should the paramters be a Point, instead of ints?
 	private List<Direction> getBestPath(Character chara, int x, int y) {
 		// TODO Auto-generated method stub
 		return null;
@@ -101,7 +111,7 @@ public class Board {
 
 
 	/**
-	 * Move chara towards the specified room (or as close as possible).
+	 * Move character towards the specified room (or as close as possible) using the A* algorithm.
 	 * 
 	 * @param chara
 	 * @param room
@@ -114,9 +124,22 @@ public class Board {
 	}
 
 
+	//=============================================================================================
+	// Query methods??
+	//=============================================================================================
 
 
-
+	
+	
+	
+	
+	
+	
+	
+	//=============================================================================================
+	// Private methods
+	//=============================================================================================
+	
 
 	/**
 	 * Read the data from the map file into an internal data structure.
@@ -130,15 +153,15 @@ public class Board {
 			//--------------------------------
 			String line = scan.nextLine();
 			Scanner lineScan = new Scanner(line);
-			int cols = lineScan.nextInt();
-			int rows = lineScan.nextInt();
+			this.cols = lineScan.nextInt();
+			this.rows = lineScan.nextInt();
 
 			// make 2D array of char to refer to, and initialise this.map
 			//----------------------------------
 			char[][] rawData = new char[rows][cols]; 
 			this.map = new Cell[rows][cols];
 
-			// read data into array
+			// read cells into array
 			//---------------------		
 			for(int i = 0; i < rows; i++){
 				if (!scan.hasNextLine()){break;}
@@ -212,9 +235,15 @@ public class Board {
 						map[i][j] = new CorridorCell(true);
 						map[i][j].addPosition(new Point(i,j));
 						break;
-					default: // otherwise assume its an intrigue, corridor, or entrance
+						
+					default: // otherwise assume its a corridor, starting point, or entrance
 						map[i][j] = new CorridorCell(false);
-						map[i][j].addPosition(new Point(i,j));
+						map[i][j].addPosition(new Point(i,j));				
+						// if its a starting point, add it to the 'startingCells' map
+						if (java.lang.Character.isDigit(c)){
+							int index = Integer.parseInt(java.lang.Character.toString(c));
+							this.startingCells.put(Character.values()[index], map[i][j]);
+						}
 						break;
 					};	
 				}
@@ -275,27 +304,56 @@ public class Board {
 			
 			// Connect the corridor squares and the secret passages
 			//-----------------------------------------------------
+
+			// connect corridor squares
+			for(int i = 0; i < rows; i++){
+				for (int j = 0; j < cols; j++){	
+					Cell c = map[i][j];
+					if (c instanceof CorridorCell){
+						this.connectCorridors((CorridorCell)c);
+					}
+				}
+			}
 			
+			// connect secret passages
+			s.setSecretPassage(g);
+			g.setSecretPassage(s);
+			k.setSecretPassage(o);
+			o.setSecretPassage(k);
 			
-
-
-
-
-
-
-
-
-
+						
 		} catch(IOException e){System.out.println(e);}
 
-
-
 	}
-
-
-	//===========================================================
-	// Enum classes
-	//===========================================================
+	
+	/**
+	 * This method connects the given corridor to all 
+	 * @param corridor
+	 */
+	private void connectCorridors(CorridorCell corridor){
+		// get coordinates of corridor
+		Point position = corridor.getPosition();
+		int x = position.x;
+		int y = position.y;
+		
+		// for each Point (i,j) surrounding corridor:
+		for (int i = x-1; i <= x+1; i++){
+			for (int j = y-1; j <= y+1; j++){
+				boolean withinBounds = i>=0 && i<this.rows && j>=0 && j<this.cols;
+				// as long as (i,j) is within bounds of the board AND
+				// the Cell at that pos is a CorridorCell AND
+				// the cell isn't itself, then connect that cell to 'corridor' 
+				if (withinBounds){
+					Cell other = map[i][j];
+					if (other instanceof CorridorCell && other != corridor){
+						corridor.connectTo(other);
+						other.connectTo(corridor);
+					}
+				}
+			}	
+		}
+	}
+	
 
 	/**
 	 * Enum for use with Move() methods, and specifying direction in general.
@@ -307,6 +365,8 @@ public class Board {
 		West
 	}
 
+	
+	
 	public static void main(String[] args){
 		Board b = new Board();
 		b.readFromFile();

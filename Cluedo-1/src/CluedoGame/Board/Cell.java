@@ -27,12 +27,16 @@ public abstract class Cell {
 	
 	
 	/**
-	 * Adds the given cell as a neighbour.  
+	 * Adds the given cell as a neighbour.  It won't add itself or null as a neighbour.
 	 * @param cell
 	 */
-	public void connectTo(Cell cell) {
-		for (Point pos: cell.getPosition()){
-			neighbours.put(pos,cell);
+	public void connectTo(Cell neighbour) {
+		if (neighbour == this || neighbour == null){
+			return;
+		}
+		
+		for (Point pos: neighbour.getPositions()){
+			neighbours.put(pos,neighbour);
 		}
 	}
 
@@ -57,16 +61,16 @@ public abstract class Cell {
 	 * Thinking I should make this abstract, so CorridorCell can't have more than one.  We'll see
 	 * @param position
 	 */
-	public void addPosition(Point position){
-		this.position.add(position);
-	}
+	public abstract void addPosition(Point position);
 	
 	/**
 	 * Returns an unmodifyable set of the positions relating to the cell.
 	 * @return
 	 */
-	public Set<Point> getPosition(){
+	public Set<Point> getPositions(){
 		return Collections.unmodifiableSet(position);
 	}
+	
+
 	
 }
