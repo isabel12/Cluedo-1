@@ -147,6 +147,7 @@ public class Board {
 	private void readFromFile() {
 
 		try{
+			
 			Scanner scan = new Scanner(new File("map.data"));
 
 			// read size of board (first line)
@@ -242,7 +243,7 @@ public class Board {
 						// if its a starting point, add it to the 'startingCells' map
 						if (java.lang.Character.isDigit(c)){
 							int index = Integer.parseInt(java.lang.Character.toString(c));
-							this.startingCells.put(Character.values()[index], map[i][j]);
+							this.startingCells.put(Character.values()[index-1], map[i][j]);
 						}
 						break;
 					};	
@@ -320,11 +321,11 @@ public class Board {
 			g.setSecretPassage(s);
 			k.setSecretPassage(o);
 			o.setSecretPassage(k);
-			
 						
 		} catch(IOException e){System.out.println(e);}
 
 	}
+	
 	
 	/**
 	 * This method connects the given corridor to all 
