@@ -7,9 +7,8 @@ package CluedoGame;
  * @author Troy Shaw
  *
  */
-public class Weapon {
 
-	public enum Type {
+	public enum Weapon {
 		Axe,
 		BaseballBat,
 		Candlestick,
@@ -21,21 +20,5 @@ public class Weapon {
 		Trophy,
 	}
 	
-	private Type type;
-	
-	/**
-	 * Creates a Weapon object with the given type.
-	 * @param type
-	 */
-	public Weapon(Type type) {
-		this.type = type;
-	}
-	
-	/**
-	 * Gets the type of weapon.
-	 * @return the type
-	 */
-	public Type getType() {
-		return type;
-	}
-}
+
+

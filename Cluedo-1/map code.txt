@@ -1,15 +1,15 @@
 24 x by 29 y
 
-xxxxxxb.xxxxx.xxxxxxu.xx
+xxxxxx5.xxxxx.xxxxxx6.xx
 xxxxxx..xxxxx?xxxxxx..xx
 xxxxxx..xxxxx.xxxxxx..xx
 xxxxxx..xxxxx.xxxxxx..xx
 xxxxxx.?xxxxx.xxxxxx..xx
-xxxxxx..xxxxx.xxxxxx..xx
-xxxxxs..xxxxxzlxxxxx.?xx
+xxxxxS..xxxxx.xxxxxx..xx
+xxxxxs..xxxxxlLxxxxx.?xx
 xxxxx...xxtxx.xxxxxx..xx
-...?......z....xlx...zox
-x..........?....z.......
+...?......z....xLx...zox
+4..........?....l.......
 xxxx.z........z.?.....z.
 xxxxxpxx..xxxxwxxx.xxxhx
 xxxxxxxpz.xxxxxxxx.xxxxx
@@ -19,7 +19,7 @@ xxxxxxxx..xxxxxxxx.xxxxx
 xxxxxxxpz.wxxxxxxw.xxxxx
 xxxxxpxx..z...?..z.xxxxx
 xxxx?z......z.......?...
-i.........xxdxxx........
+3.........xxdxxx........
 ..........xxxxxx....zxxx
 xxxxxxz...xxxxxdz...xgxx
 xxxxxxk...xxxxxx..?.xxxx
@@ -28,7 +28,7 @@ xxxxxxx..xxxxxxxx...xxxx
 xxxxxxx..xxxxxxxx...xxxx
 xxxxxxx..xxxxxxxx...xxxx
 xxxxxxx..xxxxxxxx...xxxx
-xxxxxxxy.xxxxxxxx.e.xxxx
+xxxxxxx2.xxxxxxxx.1.xxxx
 
 Key.
 

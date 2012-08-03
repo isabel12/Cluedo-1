@@ -2,6 +2,8 @@ package CluedoGame;
 
 import java.util.List;
 
+import CluedoGame.Board.Board;
+
 /**
  * Represents an actual Cluedo game.
  * One instantiates the game by supplying the number of players.
