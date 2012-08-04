@@ -4,7 +4,8 @@ import java.util.List;
 
 /**
  * Parses command line arguments and returns types of correct value.
- * @author Troy Shaw
+ *
+ * @author Troy 
  *
  */
 public class Parser {
