@@ -136,13 +136,13 @@ public class Board {
 	public void move(Player player, Point p) {
 		//run A* to get best path in the form of a list of Direction from current
 		//location to end location
-		List<Direction> path = getBestPath(player.getCharacter(), x, y);	//need to make this method
+		//List<Direction> path = getBestPath(player.getCharacter(), );	//need to make this method
 
 		//subtract path.size() from charas move count or something here...
 
 		//iterate over Direction, moving chara in that direction
 		//this assumes that getBestPath() will return a path that isn't blocked, etc
-		for (Direction d: path) move(player, d);
+		//for (Direction d: path) move(player, d);
 	}
 
 	

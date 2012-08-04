@@ -17,7 +17,7 @@ public class RoomCell extends Cell {
 	public RoomCell(Room room) {
 		super();
 		this.room = room;	
-		this.entrances = new ArrayList<Cell>();
+		this.entrances = new ArrayList<CorridorCell>();
 	}
 	
 	/**
@@ -65,6 +65,26 @@ public class RoomCell extends Cell {
 	public List<CorridorCell> getEntrances(){
 		return Collections.unmodifiableList(entrances);
 	}
+	
+	
+	/**
+	 * This method adds the entrance to its set of neighbours, and also to its List of entrances.
+	 */
+	@Override
+	public void connectTo(Cell entrance){
+		if (entrance == this || entrance == null){
+			return;
+		}
+		// add it as a neighbour
+		Point pos = entrance.getPosition();
+		neighbours.put(pos,entrance);
+		
+		// also add it as an entrance
+		if (entrance instanceof CorridorCell){
+			entrances.add((CorridorCell)entrance);
+		}
+	}
+	
 	
 	@Override
 	public void addPosition(Point position) {
