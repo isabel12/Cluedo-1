@@ -1,0 +1,32 @@
+//============================================================================================================================
+// This is just to help us roughly keep track of what we will/have worked on so we don't forget and can write about it easy :)
+//============================================================================================================================
+
+
+Todo over weekend
+-----------------
+Isabel - Finish Board, implement A* search
+Troy - CMDGame and Parser, thoughts about methods needed for CluedoGame
+
+
+
+
+
+
+
+
+Record of our hours worked 
+==============================
+Both
+----
+Friday 11 - 1		Discussed game structure, and worked out how commandline would interface with the game.
+
+
+Isabel
+------
+Fri 4 hours - set up Board class so it could read in, and implemented Cell, RoomCell, and Corridor cell.
+
+
+
+Troy
+----
