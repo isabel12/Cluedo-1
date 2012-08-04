@@ -40,7 +40,6 @@ Key
 
 Rooms (entrance square lower case)
 -----
-
 s = spa
 t = theatre
 l = living room

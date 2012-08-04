@@ -120,7 +120,7 @@ public class Board {
 
 
 	//=============================================================================================
-	// Moving/path methods
+	// Ideas for wrapper methods
 	//=============================================================================================
 
 
@@ -160,19 +160,10 @@ public class Board {
 	}
 	
 	
-	
-	
-	
-	//QUESTION: should the paramters be a Point, instead of ints?
-	private List<Direction> getBestPath(Character chara, Point p) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	
-	
 	/**
 	 * This method returns the optimum path from the player's position, and the point given.
+	 * 
+	 * Wrapper method for List<Cell> getBestPathTo(Cell s, Cell g).
 	 * 
 	 * @param player
 	 * @param p
@@ -186,16 +177,32 @@ public class Board {
 	}
 	
 	
+	//=============================================================================================
+	// Path finding methods (woo!)
+	//=============================================================================================
 	
+	
+	/**
+	 * 
+	 * This method returns the optimum path in the form of a List<Cell>, where the first entry is the start, and the last the goal.
+	 * 
+	 * This method is a wrapper method for the A* search algorithm, whose heuristic getEstimate() algorithm can't handle rooms being in lots of places at once.
+	 * It takes the start cell and the goal cell, checks whether either of them are rooms, and if so, it gets all optimum paths between the room entrances, and the 
+	 * start/goal CorridorCell, picks the best one, then makes sure to include the room Cell in the list before returning.
+	 * 
+	 * @param s
+	 * @param g
+	 * @return
+	 */
 	public List<Cell> getBestPathTo(Cell s, Cell g){
-
 		// to hold the best path
 		List<Cell> bestPath = new ArrayList<Cell>();
 		int bestSize = Integer.MAX_VALUE;
 		
-		// if both start and goal are RoomCells:
-		// get all the rooms entrances, and find best path between all start entrances, and goal entrances.  
+		// a. if both start and goal are RoomCells:
+		//-----------------------------------------
 		if (s instanceof RoomCell && g instanceof RoomCell){
+			// get all the rooms entrances, and find best path between all start entrances, and goal entrances. 
 			RoomCell start = (RoomCell)s;
 			RoomCell goal = (RoomCell)g;
 			List<CorridorCell> sEntrances = start.getEntrances();
@@ -214,9 +221,11 @@ public class Board {
 			// add start room and goal room back into the final list
 			bestPath.set(0, start);
 			bestPath.add(goal);	
-			
-			
 		}
+		
+		
+		// b. if start is a RoomCell:
+		//----------------------------
 		else if (s instanceof RoomCell){
 			RoomCell start = (RoomCell)s;
 			List<CorridorCell> sEntrances = start.getEntrances();
@@ -232,9 +241,11 @@ public class Board {
 			}
 			// add start room back into the final list
 			bestPath.set(0, start);
-			
-			
 		}
+		
+		
+		// c. if goal is a RoomCell:
+		//--------------------------
 		else if (g instanceof RoomCell){
 			RoomCell goal = (RoomCell)g;
 			List<CorridorCell> gEntrances = goal.getEntrances();
@@ -252,6 +263,10 @@ public class Board {
 			bestPath.add(goal);
 			
 		}
+		
+		
+		// d. if both are corridors:
+		//-----------------------
 		else {
 			bestPath = this.getBestPathTo((CorridorCell)s, (CorridorCell)g);
 		}
@@ -260,8 +275,11 @@ public class Board {
 		return bestPath;	
 	}
 	
+	
 	/**
-	 * This is my A* algorithm.  It returns a list of the best path from the Player's current position to the cell at the given point.
+	 * This method returns the optimum unobstructed path in the form of a List<Cell>, where the first entry is the starting Cell, and the last the goal Cell.
+	 * 
+	 * This method implements the slow version of the A* search algorithm,  and can only calculate paths between CorridorCells. It returns a list of the best path from the Player's current position to the cell at the given point.
 	 * @param player
 	 * @param p
 	 * @return
@@ -310,12 +328,12 @@ public class Board {
 					break; 
 				}
 				
-				// add all neighbours whose paths are better than recorded, and less than best to goal.
+				// add all neighbours whose paths are better than recorded, and less than best to goal, and empty.
 				int toNeigh = nextBest.getCostToHere() + 1;
 				for(Cell n: cell.getNeighbours()){
 					if (n instanceof CorridorCell){
 						CorridorCell neigh = (CorridorCell)n;
-						if (toNeigh < bestPathTo.get(neigh) && toNeigh < bestToGoal){
+						if (toNeigh < bestPathTo.get(neigh) && toNeigh < bestToGoal && neigh.isEmpty()){
 							int total = toNeigh + this.getEstimate(neigh, goal);
 							fringe.add(new CellPathObject(neigh, cell, toNeigh, total));
 							// if the neighbour is the goal, record new best time
