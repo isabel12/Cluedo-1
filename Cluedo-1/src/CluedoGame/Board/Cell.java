@@ -1,9 +1,12 @@
 package CluedoGame.Board;
 
 import java.awt.Point;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,14 +18,14 @@ import java.util.Set;
  */
 public abstract class Cell {
 	protected Map<Point,Cell> neighbours;
-	Set<Point> position;
+	List<Point> position;
 
 	/**
 	 * Super constructor - this initiates the set of neighbours
 	 */
 	public Cell() {
 		neighbours = new HashMap<Point,Cell>();
-		position = new HashSet<Point>();
+		position = new ArrayList<Point>();
 	}
 	
 	
@@ -57,19 +60,38 @@ public abstract class Cell {
 		}
 	}
 	
+	public Set<Cell> getNeighbours(){
+		Collection<Cell> coll = neighbours.values();
+		Set<Cell> neighs = new HashSet<Cell>();
+		neighs.addAll(coll);
+		return neighs;
+	}
+	
 	/**
 	 * Thinking I should make this abstract, so CorridorCell can't have more than one.  We'll see
 	 * @param position
 	 */
 	public abstract void addPosition(Point position);
 	
+	public abstract void setEmpty(boolean isEmpty);
+	
+	public abstract Point getPosition();
+	
+	
+	
 	/**
-	 * Returns an unmodifyable set of the positions relating to the cell.
+	 * Returns a set of the positions relating to the cell.
 	 * @return
 	 */
 	public Set<Point> getPositions(){
-		return Collections.unmodifiableSet(position);
+		Set<Point> positions = new HashSet<Point>();
+		position.addAll(this.position);
+		return positions;
 	}
+	
+
+	
+	
 	
 
 	

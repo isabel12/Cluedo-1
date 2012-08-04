@@ -8,6 +8,9 @@ public class CorridorCell extends Cell {
 	private boolean isEmpty;
 	private boolean isIntrigue;
 	
+	CorridorCell pathFrom;
+	
+	
 	public CorridorCell(boolean intrigue) {
 		super();
 		this.isIntrigue = intrigue;
@@ -35,7 +38,8 @@ public class CorridorCell extends Cell {
 	 * Sets the 'isEmpty' status of the cell.
 	 * @param isEmpty
 	 */
-	public void setEmpty(Boolean isEmpty){
+	@Override
+	public void setEmpty(boolean isEmpty){
 		this.isEmpty = isEmpty;
 	}
 	
@@ -65,6 +69,19 @@ public class CorridorCell extends Cell {
 		}
 	}
 	
+	
+	public void resetPath(){
+		this.pathFrom = null;
+	}
+	
+	
+	public void setPathFrom(CorridorCell from){
+		this.pathFrom = from;
+	}
+	
+	public CorridorCell getPathFrom(){
+		return this.pathFrom;
+	}
 	
 	/**
 	 * I've set this up for debugging purposes.  It can be changed later if necessary.

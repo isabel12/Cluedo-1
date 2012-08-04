@@ -1,6 +1,9 @@
 package CluedoGame.Board;
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import CluedoGame.*;
@@ -9,10 +12,12 @@ import CluedoGame.*;
 public class RoomCell extends Cell {
 	Room room;
 	RoomCell secretPassage;
+	List<CorridorCell> entrances; 
 
 	public RoomCell(Room room) {
 		super();
 		this.room = room;	
+		this.entrances = new ArrayList<Cell>();
 	}
 	
 	/**
@@ -52,6 +57,15 @@ public class RoomCell extends Cell {
 		return this.secretPassage;
 	}
 	
+
+	public void addEntrance(CorridorCell entrance){
+		this.entrances.add(entrance);
+	}
+	
+	public List<CorridorCell> getEntrances(){
+		return Collections.unmodifiableList(entrances);
+	}
+	
 	@Override
 	public void addPosition(Point position) {
 		if (position != null){
@@ -60,11 +74,35 @@ public class RoomCell extends Cell {
 	}
 	
 	/**
+	 * This method is unsupported for RoomCell.
+	 * @throws UnsupportedOperationException.
+	 */
+	@Override
+	public void setEmpty(boolean isEmpty) {
+		throw new UnsupportedOperationException("You can't set a RoomCell to be empty/not empty.");
+	}
+	
+	/**
+	 * This may need changing!!!  Returns the first position in its set of positions.
+	 * Kind of unsupported.
+	 */
+	@Override
+	public Point getPosition() {
+		return position.get(0);
+	}
+	
+	
+	/**
 	 * I've set this up for debugging purposes.  It can be changed later if necessary.
 	 */
 	@Override
 	public String toString(){
 		return this.room.toString();
 	}
+
+
+
+	
+
 	
 }
