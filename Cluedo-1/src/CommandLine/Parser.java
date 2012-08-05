@@ -2,6 +2,11 @@ package CommandLine;
 
 import java.util.List;
 
+import CluedoGame.Character;
+import CluedoGame.Room;
+import CluedoGame.Weapon;
+
+
 /**
  * Parses command line arguments and returns types of correct value.
  *
@@ -24,7 +29,7 @@ public class Parser {
 		PrintStatus,
 		Help,
 	}
-	
+
 	/**
 	 * Returns the enum that corresponds to the entered command
 	 * @param str their command string
@@ -60,35 +65,35 @@ public class Parser {
 		else if (str.startsWith("end turn")) {
 			return Command.EndTurn;
 		}
-		
+
 		else if (str.startsWith("print cards")) {
 			return Command.PrintCards;
 		} 
-		
+
 		else if (str.startsWith("print locations")) {
 			return Command.PrintStatus;
 		}
-		
+
 		else if (str.startsWith("print status")) {
 			return Command.PrintStatus;
 		}
-		
+
 		else if (str.startsWith("print actions")) {
 			return Command.PrintActions;
 		}
-		
+
 		else if (str.startsWith("help")) {
 			return Command.Help;
 		}
-		
+
 		//they entered nothing that matches, so return null
 		else return null;
 	}
-	
-	
+
+
 	//Need to figure out our class type for how we deal with suggestions and moving
 	//don't want to parse until we have proper object to store as
-	
+
 	/**
 	 * Parses given string and returns a list of Card.
 	 * 
@@ -101,27 +106,43 @@ public class Parser {
 	 * @param str
 	 * @return
 	 */
-	public List<Card> parseSuggestion(String str) {
+	public Weapon parseWeapon(String str) {
+		str = str.toLowerCase();
+
+		for (Weapon w: Weapon.values()) {
+			if (str.contains(w.toString())) return w;
+		}
+
 		return null;
 	}
-	
+
 	/**
-	 * Parses given string and returns the location it refers to.
-	 * Returns null if location is invalid.
+	 * Checks the given string for the occurrence of a room, and returns that room.
+	 * The string only has to contain the given string in any location to return it.
+	 * 
+	 * e.g "move hall" -> Hall, "pool room" -> PoolRoom, "dshadsjka dsa Theatre sa" -> Theatre
+	 * 
 	 * @param str
 	 * @return
 	 */
-	public Location parseLocation(String str) {
+	public Room parseRoom(String str) {
 		str = str.toLowerCase();
-		
-		//gets rid of "move towards" at start of str, and removes whitespace
-		if (str.startsWith("move towards")) {
-			str = str.split("move towards")[1].trim();
+
+		for (Room r: Room.values()) {
+			if (str.contains(r.toString())) return r;
 		}
-		
-		
-		
-		
+
+		return null;
+	}
+
+
+	public Character parseCharacter(String str) {
+		str = str.toLowerCase();
+
+		for (Character c: Character.values()) {
+			if (str.contains(c.toString())) return c;
+		}
+
 		return null;
 	}
 }

@@ -24,7 +24,7 @@ public class RoomCell extends Cell {
 	 * Returns the room this cell corresponds to.
 	 * @return
 	 */
-	Room getRoom(){
+	public Room getRoom(){
 		return this.room;
 	}
 	

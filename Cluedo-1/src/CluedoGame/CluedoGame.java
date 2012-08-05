@@ -1,9 +1,11 @@
 package CluedoGame;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import CluedoGame.Board.Board;
+import CluedoGame.Board.RoomCell;
 
 /**
  * Represents an actual Cluedo game.
@@ -91,6 +93,19 @@ public class CluedoGame {
 	
 	
 	/**
+	 * Returns the smallest number of steps to each room on the map.
+	 * For rooms with multiple doors, only the smallest path is given.
+	 * 
+	 * 
+	 * @param player
+	 * @return
+	 */
+	public Map<RoomCell, Integer> getRoomSteps(Player player) {
+		
+		return null;
+	}
+	
+	/**
 	 * Ends the current players turn.
 	 * If the player cannot end their turn because they haven't rolled, moved, etc,
 	 * this method throws InvalidMoveException.
@@ -128,6 +143,27 @@ public class CluedoGame {
 	}
 
 
+	public void makeSuggestion(Character chara, Weapon weapon) throws InvalidMoveException{
+		
+	}
+	
+	public void makeSuggestion(Character chara, Weapon weapon, Room room) throws InvalidMoveException {
+		
+	}
+	
+	/**
+	 * Moves the player as close to (or inside if possible) the given room.
+	 * Will find the most efficient path to the desired room.
+	 * 
+	 * @param room
+	 * @throws InvalidMoveException if the player has no steps left
+	 */
+	public void moveTowards(Room room) throws InvalidMoveException {
+		//first need to check player has moves left/ can move at all
+		//then find the shortest path to a door of the given room
+		//then move as many steps as the player has left to that location
+	}
+	
 	/**
 	 * Moves the player through the secret entrance of the room they are in, if it exists, and they are able to.
 	 * 
