@@ -48,7 +48,7 @@ public class CMDGame {
 		parser = new Parser();
 
 		//the string the user types each prompt
-		String commandStr;
+		String commandStr = "";
 		//the command extracted from their typed string
 		Command command;
 
@@ -61,8 +61,11 @@ public class CMDGame {
 
 
 			//iterate while they haven't ended their turn
-			while (game.isTurn(player)) {
+			//			while (game.isTurn(player)) {
+			while (true) {
+
 				commandStr = scan.nextLine();
+
 				command = parser.getCommand(commandStr);
 
 				switch (command) {
@@ -99,6 +102,7 @@ public class CMDGame {
 				case Help:
 					printHelp();
 					break;
+				case Undefined:
 				default:
 					System.out.println("You entered an invalid command.");
 					System.out.println("Use [help] or [print commands] for information.");
@@ -129,7 +133,7 @@ public class CMDGame {
 		Character chara = parser.parseCharacter(suggestion);
 		Weapon weapon = parser.parseWeapon(suggestion);
 		Room room = parser.parseRoom(suggestion);
-		
+
 
 		try {
 			game.makeSuggestion(chara, weapon, room);
@@ -147,7 +151,13 @@ public class CMDGame {
 	private void doMoveTowards(String roomStr) {
 		//first parse the locations given by string
 		Room room = parser.parseRoom(roomStr);
-
+		
+		if (room == null) {
+			System.out.println("You entered an invalid room.");
+		} else {
+			System.out.println("Moving towards " + room.toString());
+		}
+		
 		try {
 			game.moveTowards(room);
 			System.out.println("You moved...");	
@@ -219,26 +229,26 @@ public class CMDGame {
 
 		//this method may need simplification by performing logic in CluedoGame
 
-//		if (!player.hasRolled()) {
-//			System.out.println("Roll dice");
-//		}
-//
-//		if (player.stepsLeft() > 0 && !hasEnteredRoom()) {
-//			System.out.println("Move towards a location");
-//		}
-//
-//		if (player.inRoom() && !player.hasMadeSuggestion()) {
-//			if (player.inRoom(PoolRoom) {
-//				System.out.println("Make final accusation");
-//			} else {
-//				System.out.println("Make suggestion");
-//			}
-//		}
-//
-//		//if in a corner room, you're allowed to move through secret passage
-//		if (player.inCornerRoom() && !player.hasEnteredRoom()) {
-//			System.out.println("Move through secret passage");
-//		}
+		//		if (!player.hasRolled()) {
+		//			System.out.println("Roll dice");
+		//		}
+		//
+		//		if (player.stepsLeft() > 0 && !hasEnteredRoom()) {
+		//			System.out.println("Move towards a location");
+		//		}
+		//
+		//		if (player.inRoom() && !player.hasMadeSuggestion()) {
+		//			if (player.inRoom(PoolRoom) {
+		//				System.out.println("Make final accusation");
+		//			} else {
+		//				System.out.println("Make suggestion");
+		//			}
+		//		}
+		//
+		//		//if in a corner room, you're allowed to move through secret passage
+		//		if (player.inCornerRoom() && !player.hasEnteredRoom()) {
+		//			System.out.println("Move through secret passage");
+		//		}
 
 		//need to get conditions for being able to end a turn prematurely
 		System.out.println("End turn");
@@ -250,9 +260,9 @@ public class CMDGame {
 	 */
 	private void printLocations(Player player) {
 		System.out.println("Locations:");
-		
+
 		Map<RoomCell, Integer> rooms = game.getRoomSteps(player);
-		
+
 		for (RoomCell c: rooms.keySet()) {
 			System.out.println("\t" + c.getRoom() + ", " + rooms.get(c) + " steps away."); 
 		}
@@ -320,7 +330,7 @@ public class CMDGame {
 			}
 		} while (number < 3 || number > 6);
 
-		scan.close();
+		//scan.close();
 		return number;
 	}
 

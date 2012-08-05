@@ -1,5 +1,6 @@
 package CluedoGame;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -50,7 +51,7 @@ public class CluedoGame {
 	 * @param numPlayers number of players for this game
 	 */
 	public CluedoGame(int numPlayers) {
-
+		livePlayers = new ArrayList<Player>();
 	}
 
 	

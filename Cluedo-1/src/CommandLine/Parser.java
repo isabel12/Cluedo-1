@@ -28,6 +28,7 @@ public class Parser {
 		PrintLocations,
 		PrintStatus,
 		Help,
+		Undefined
 	}
 
 	/**
@@ -86,61 +87,57 @@ public class Parser {
 			return Command.Help;
 		}
 
-		//they entered nothing that matches, so return null
-		else return null;
+		//they entered nothing that matches, so return undefined
+		else return Command.Undefined;
 	}
 
 
-	//Need to figure out our class type for how we deal with suggestions and moving
-	//don't want to parse until we have proper object to store as
-
 	/**
-	 * Parses given string and returns a list of Card.
-	 * 
-	 * list.get(0) is the Character of the accusation.
-	 * list.get(1) is the Weapon of the accusation.
-	 * list.get(2) is the optional location of the (final) accusation.
-	 * 
-	 * Returns null if parse fails.
-	 * 
+	 * Checks the given string for the occurrence of a weapon name, and returns that Weapon enum.
+	 * The string only has to contain the given string in any location to return it.
+	 *  
 	 * @param str
-	 * @return
+	 * @return the enum for the Weapon, or null if not in string
 	 */
 	public Weapon parseWeapon(String str) {
 		str = str.toLowerCase();
 
 		for (Weapon w: Weapon.values()) {
-			if (str.contains(w.toString())) return w;
+			if (str.contains(w.toString().toLowerCase())) return w;
 		}
 
 		return null;
 	}
 
 	/**
-	 * Checks the given string for the occurrence of a room, and returns that room.
+	 * Checks the given string for the occurrence of a room, and returns that Room enum.
 	 * The string only has to contain the given string in any location to return it.
 	 * 
-	 * e.g "move hall" -> Hall, "pool room" -> PoolRoom, "dshadsjka dsa Theatre sa" -> Theatre
-	 * 
 	 * @param str
-	 * @return
+	 * @return the enum for the Room, or null if not in string
 	 */
 	public Room parseRoom(String str) {
 		str = str.toLowerCase();
 
 		for (Room r: Room.values()) {
-			if (str.contains(r.toString())) return r;
+			if (str.contains(r.toString().toLowerCase())) return r;
 		}
 
 		return null;
 	}
 
-
+	/**
+	 * Checks the given string for the occurrence of a character, and returns that Character.
+	 * The string only has to contain the given string in any location to return it.
+	 * 
+	 * @param str
+	 * @return the enum for the Character, or null if not in string
+	 */
 	public Character parseCharacter(String str) {
 		str = str.toLowerCase();
 
 		for (Character c: Character.values()) {
-			if (str.contains(c.toString())) return c;
+			if (str.contains(c.toString().toLowerCase())) return c;
 		}
 
 		return null;
