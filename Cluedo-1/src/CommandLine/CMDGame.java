@@ -1,9 +1,11 @@
 package CommandLine;
 
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 
 import CluedoGame.CluedoGame;
+import CluedoGame.InvalidMoveException;
 import CluedoGame.Player;
 import CommandLine.Parser.Command;
 
@@ -48,10 +50,10 @@ public class CMDGame {
 
 
 		//iterate while game hasn't ended
-		while (game.hasNotEnded()) {
+		while (!game.isGameOver()) {
 
 			//get the player
-			game.getCurrentPlayer();
+			player = game.getNextPlayer();
 
 
 			//iterate while they haven't ended their turn
@@ -150,8 +152,8 @@ public class CMDGame {
 	 */
 	private void doRoll() {		
 		try {
-			game.roll();
-			System.out.println("You rolled a " + game.getRoll());
+			int roll = game.rollDice();
+			System.out.println("You rolled a " + roll);
 		} catch (InvalidMoveException e) {
 			System.out.println(e.getMessage());
 		}
@@ -168,6 +170,7 @@ public class CMDGame {
 			System.out.println(e.getMessage());
 		}
 	}
+
 
 	/**
 	 * Attempts to end the current players turn.
@@ -186,7 +189,7 @@ public class CMDGame {
 	 * @param player
 	 */
 	private void printNotepad(Player player) {
-		//gotta figure out how to implement notebook
+		//need to implement notebook
 	}
 
 	/**
@@ -269,7 +272,7 @@ public class CMDGame {
 		System.out.println("roll dice\t-\trolls the dice.");
 		System.out.println("move towards [location]\t-\tmoves the player towards [location]");
 		System.out.println("get notepad\t-\tdisplays the notepad to help solve the murder");
-		System.out.println("make suggestion [character] [weapon] [room*]\t-\tmakes a suggestion" +)
+		System.out.println("make suggestion [character] [weapon] [room*]\t-\tmakes a suggestion" +
 					"or accusation. [room] must be specified when accusing from pool room.");
 			System.out.println("select card [card]\t-\tused to refute a murder suggestion");
 			System.out.println("secret passage\t-\tmoves the player through the secret passage");

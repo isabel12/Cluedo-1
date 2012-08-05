@@ -28,3 +28,6 @@ Fri 4 hours			Set up Board class so it could read in, and implemented Cell, Room
 
 Troy
 ----
+Friday 3rd			Set up CMDGame and Parser classes. Added various methods and parameters for initial planning.
+Saturday 4th		Added majority of content for CMDGame class. Biggest part switch/ case for different commands.
+Sunday 5th			Refined switch/ case for CMDGame; added further functionality to the Parser class to properly parse.

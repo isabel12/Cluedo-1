@@ -24,8 +24,3 @@ public enum Character {
 		return getName();
 	}
 }
-
-
-
-
-
