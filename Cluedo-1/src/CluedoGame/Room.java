@@ -1,6 +1,6 @@
 package CluedoGame;
 
-public enum Room {
+public enum Room implements Card {
 		DiningRoom("Dining Room"),
 		GuestRoom("Guest Room"),
 		Hall("Hall"),

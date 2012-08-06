@@ -8,7 +8,7 @@ package CluedoGame;
  *
  */
 
-	public enum Weapon {
+	public enum Weapon implements Card {
 		Axe("Axe"),
 		BaseballBat("Baseball Bat"),
 		Candlestick("Candle Stick"),

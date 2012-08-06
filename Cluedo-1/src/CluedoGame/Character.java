@@ -1,6 +1,6 @@
 package CluedoGame;
 
-public enum Character {
+public enum Character implements Card {
 	Scarlett("Kasandra Scarlett"),
 	Mustard("Jack Mustard"),
 	White("Diane White"),
