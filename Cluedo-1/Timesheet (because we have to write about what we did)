@@ -5,7 +5,7 @@
 
 Todo over weekend
 -----------------
-Isabel - Finish Board, implement A* search
+Isabel - Finish Board, tidy up Cell classes!
 Troy - CMDGame and Parser, thoughts about methods needed for CluedoGame
 
 
@@ -24,6 +24,7 @@ Friday 11 - 1		Discussed game structure, and worked out how commandline would in
 Isabel
 ------
 Fri 4 hours			Set up Board class so it could read in, and implemented Cell, RoomCell, and Corridor cell.
+Sat 4 hours			Implemented A* search
 
 
 Troy
