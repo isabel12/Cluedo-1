@@ -1,10 +1,16 @@
 package CommandLine;
 
 import java.util.InputMismatchException;
+import java.util.Map;
 import java.util.Scanner;
 
 import CluedoGame.CluedoGame;
+import CluedoGame.InvalidMoveException;
 import CluedoGame.Player;
+import CluedoGame.Character;
+import CluedoGame.Room;
+import CluedoGame.Weapon;
+import CluedoGame.Board.RoomCell;
 import CommandLine.Parser.Command;
 
 
@@ -42,21 +48,24 @@ public class CMDGame {
 		parser = new Parser();
 
 		//the string the user types each prompt
-		String commandStr;
+		String commandStr = "";
 		//the command extracted from their typed string
 		Command command;
 
 
 		//iterate while game hasn't ended
-		while (game.hasNotEnded()) {
+		while (!game.isGameOver()) {
 
 			//get the player
-			game.getCurrentPlayer();
+			player = game.getNextPlayer();
 
 
 			//iterate while they haven't ended their turn
-			while (game.isTurn(player)) {
+			//			while (game.isTurn(player)) {
+			while (true) {
+
 				commandStr = scan.nextLine();
+
 				command = parser.getCommand(commandStr);
 
 				switch (command) {
@@ -81,15 +90,19 @@ public class CMDGame {
 				case PrintActions:
 					printActions(player);
 					break;
-				case PrintNotepad:
-					printNotepad(player);
-					break;
 				case PrintCards:
 					printCards(player);
+					break;
+				case PrintLocations:
+					printLocations(player);
+					break;
+				case PrintNotepad:
+					printNotepad(player);
 					break;
 				case Help:
 					printHelp();
 					break;
+				case Undefined:
 				default:
 					System.out.println("You entered an invalid command.");
 					System.out.println("Use [help] or [print commands] for information.");
@@ -117,10 +130,13 @@ public class CMDGame {
 	 * @param suggestion string to be parsed with suggestion params
 	 */
 	private void doMakeSuggestion(String suggestion) {
-		List<Card> cards = parser.parseSuggestion(suggestion);
+		Character chara = parser.parseCharacter(suggestion);
+		Weapon weapon = parser.parseWeapon(suggestion);
+		Room room = parser.parseRoom(suggestion);
+
 
 		try {
-			game.makeSuggestion(cards);
+			game.makeSuggestion(chara, weapon, room);
 
 			//will need logic here to iterate over players to allow refute
 		} catch (InvalidMoveException e) {
@@ -129,15 +145,21 @@ public class CMDGame {
 	}
 
 	/**
-	 * Attempts to move towards a location on the map.
+	 * Attempts to move towards a room on the map.
 	 * @param location a string 
 	 */
-	private void doMoveTowards(String location) {
+	private void doMoveTowards(String roomStr) {
 		//first parse the locations given by string
-		Location location = parser.parseLocation(location);
-
+		Room room = parser.parseRoom(roomStr);
+		
+		if (room == null) {
+			System.out.println("You entered an invalid room.");
+		} else {
+			System.out.println("Moving towards " + room.toString());
+		}
+		
 		try {
-			game.moveTowards(location);
+			game.moveTowards(room);
 			System.out.println("You moved...");	
 			//will need to refine their move info; steps taken, how far from location, etc
 		} catch (InvalidMoveException e) {
@@ -150,8 +172,8 @@ public class CMDGame {
 	 */
 	private void doRoll() {		
 		try {
-			game.roll();
-			System.out.println("You rolled a " + game.getRoll());
+			int roll = game.rollDice();
+			System.out.println("You rolled a " + roll);
 		} catch (InvalidMoveException e) {
 			System.out.println(e.getMessage());
 		}
@@ -163,11 +185,12 @@ public class CMDGame {
 	private void doMoveSecretPassage() {
 		try {
 			game.moveSecretPassage();
-			System.out.println("You move to" + player.getLocation());
+			System.out.println("You move to...");
 		} catch (InvalidMoveException e) {
 			System.out.println(e.getMessage());
 		}
 	}
+
 
 	/**
 	 * Attempts to end the current players turn.
@@ -186,7 +209,7 @@ public class CMDGame {
 	 * @param player
 	 */
 	private void printNotepad(Player player) {
-		//gotta figure out how to implement notebook
+		//need to implement notebook
 	}
 
 	/**
@@ -206,26 +229,26 @@ public class CMDGame {
 
 		//this method may need simplification by performing logic in CluedoGame
 
-		if (!player.hasRolled()) {
-			System.out.println("Roll dice");
-		}
-
-		if (player.stepsLeft() > 0 && !hasEnteredRoom()) {
-			System.out.println("Move towards a location");
-		}
-
-		if (player.inRoom() && !player.hasMadeSuggestion()) {
-			if (player.inRoom(PoolRoom) {
-				System.out.println("Make final accusation");
-			} else {
-				System.out.println("Make suggestion");
-			}
-		}
-
-		//if in a corner room, you're allowed to move through secret passage
-		if (player.inCornerRoom() && !player.hasEnteredRoom()) {
-			System.out.println("Move through secret passage");
-		}
+		//		if (!player.hasRolled()) {
+		//			System.out.println("Roll dice");
+		//		}
+		//
+		//		if (player.stepsLeft() > 0 && !hasEnteredRoom()) {
+		//			System.out.println("Move towards a location");
+		//		}
+		//
+		//		if (player.inRoom() && !player.hasMadeSuggestion()) {
+		//			if (player.inRoom(PoolRoom) {
+		//				System.out.println("Make final accusation");
+		//			} else {
+		//				System.out.println("Make suggestion");
+		//			}
+		//		}
+		//
+		//		//if in a corner room, you're allowed to move through secret passage
+		//		if (player.inCornerRoom() && !player.hasEnteredRoom()) {
+		//			System.out.println("Move through secret passage");
+		//		}
 
 		//need to get conditions for being able to end a turn prematurely
 		System.out.println("End turn");
@@ -236,10 +259,12 @@ public class CMDGame {
 	 * @param player
 	 */
 	private void printLocations(Player player) {
-		System.out.println("Locations");
+		System.out.println("Locations:");
 
-		for (Location l: game.getLocations(player)) {
-			System.out.println("\t" + l.getName() + ", " + l.numSteps());
+		Map<RoomCell, Integer> rooms = game.getRoomSteps(player);
+
+		for (RoomCell c: rooms.keySet()) {
+			System.out.println("\t" + c.getRoom() + ", " + rooms.get(c) + " steps away."); 
 		}
 	}
 
@@ -257,7 +282,7 @@ public class CMDGame {
 	 */
 	private void printCards(Player player) {
 		System.out.println("You have:");
-		for (Card c: player.getCards())	System.out.println("\t" + c);
+		//for (Card c: player.getCards())	System.out.println("\t" + c);
 	}
 
 	/**
@@ -269,13 +294,13 @@ public class CMDGame {
 		System.out.println("roll dice\t-\trolls the dice.");
 		System.out.println("move towards [location]\t-\tmoves the player towards [location]");
 		System.out.println("get notepad\t-\tdisplays the notepad to help solve the murder");
-		System.out.println("make suggestion [character] [weapon] [room*]\t-\tmakes a suggestion" +)
-					"or accusation. [room] must be specified when accusing from pool room.");
-			System.out.println("select card [card]\t-\tused to refute a murder suggestion");
-			System.out.println("secret passage\t-\tmoves the player through the secret passage");
-			System.out.println("end turn\t-\tends the current players turn");
-			System.out.println("print status\t-\tprints the current players status, their room, etc");
-			System.out.println("help\t-\tdisplays this help message");
+		System.out.println("make suggestion [character] [weapon] [room*]\t-\tmakes a suggestion" +
+				"or accusation. [room] must be specified when accusing from pool room.");
+		System.out.println("select card [card]\t-\tused to refute a murder suggestion");
+		System.out.println("secret passage\t-\tmoves the player through the secret passage");
+		System.out.println("end turn\t-\tends the current players turn");
+		System.out.println("print status\t-\tprints the current players status, their room, etc");
+		System.out.println("help\t-\tdisplays this help message");
 	}
 
 
@@ -305,7 +330,7 @@ public class CMDGame {
 			}
 		} while (number < 3 || number > 6);
 
-		scan.close();
+		//scan.close();
 		return number;
 	}
 

@@ -9,16 +9,25 @@ package CluedoGame;
  */
 
 	public enum Weapon {
-		Axe,
-		BaseballBat,
-		Candlestick,
-		Dumbbell,
-		Knife,
-		Pistol,
-		Poison,
-		Rope,
-		Trophy,
+		Axe("Axe"),
+		BaseballBat("Baseball Bat"),
+		Candlestick("Candle Stick"),
+		Dumbbell("Dumbbell"),
+		Knife("Knife"),
+		Pistol("Knife"),
+		Poison("Prison"),
+		Rope("Rope"),
+		Trophy("Trophy");
+		
+		
+		private final String weapon;
+
+		Weapon(String weapon){
+			this.weapon = weapon;
+		}
+		
+		@Override
+		public String toString(){
+			return weapon;
+		}
 	}
-	
-
-

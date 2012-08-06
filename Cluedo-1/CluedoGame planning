@@ -1,0 +1,72 @@
+Anticipated methods needed from CMDGame POV:
+
+
+//returns the next player. Requires previous player ended their turn
+
+Player getNextPlayer() throws InvalidMoveException (previous player hasn't finished turn)
+
+
+
+//returns true if it is the given players turn
+
+boolean isTurn(Player player) 
+
+
+
+//ends the current players turn
+
+void endTurn() throws InvalidMoveException (player cannot end turn without doing an action, rolling, etc)
+
+
+
+//returns true if game has reached an end state
+//a game continues until a player guesses correctly, or there is only 1 player left
+
+boolean isGameOver()
+
+
+
+//moves the player towards the given location
+//Cell might need to change. Just needs to be able to move to a room at this stage
+//if we add those cards, then a way to move to cards
+//Not specifically needed for CMD, but will need a way to move to arbitrary locations for GUI version
+
+void moveTowards(Cell location) throws InvalidMoveException (player cannnot move; no steps left; already entered room, etc)
+
+
+//causes the current player to 'roll' their dice
+
+int roll() throws InvalidMoveException (player has already rolled)
+
+
+//moves the player through the secret passage
+
+void moveSecretLocation() throws InvalidMoveException (player isn't in a corner room; already moved; etc)
+
+
+
+
+//returns the notepad of the player. A notepad could just be a list of string entries they have written in
+
+List<String> getNotepad(Player player) 
+
+
+
+//records the given text in the players notepad
+
+void addToNotePad(Player player, String entry) 
+
+
+//returns some type of indication as to what the player can do
+//perhaps this can be implemented in lots of seperate methods
+//e.g canRoll(), canMove(), canAccuse(), etc
+
+???? getActions(Player player)
+
+
+
+//A way to return the different options a player can move to, as well as #steps to get there
+//a mapping of location to the #steps to get there perhaps
+
+Map<Location, Integer> getLocations() 
+

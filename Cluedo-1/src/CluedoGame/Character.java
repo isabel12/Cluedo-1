@@ -1,7 +1,6 @@
 package CluedoGame;
 
 public enum Character {
-	
 	Scarlett("Kasandra Scarlett"),
 	Mustard("Jack Mustard"),
 	White("Diane White"),
@@ -24,8 +23,3 @@ public enum Character {
 		return getName();
 	}
 }
-
-
-
-
-
