@@ -26,14 +26,12 @@ public class CMDGame {
 	private Parser parser;
 
 	public CMDGame() {
-		System.out.println("Welcome to Cluedo!\n");
-
 		//construct the game object
+		System.out.println("Welcome to Cluedo!\n");
 		game = new CluedoGame(getNumberPlayers());
 
-		System.out.println("Starting a new game of Cluedo!");
-
 		//play a real game now
+		System.out.println("Starting a new game of Cluedo!");
 		startGame();
 	}
 
@@ -58,6 +56,10 @@ public class CMDGame {
 
 			//get the player
 			player = game.getNextPlayer();
+			
+			// get the game state, and print message
+			
+			
 
 
 			//iterate while they haven't ended their turn
@@ -126,7 +128,7 @@ public class CMDGame {
 
 	/**
 	 * Attempts to make a suggestion/ accusation.
-	 * Method automatically handles optional third room param when accusing from pool-room.
+	 * Method automatically handles optional third room when accusing from pool-room.
 	 * @param suggestion string to be parsed with suggestion params
 	 */
 	private void doMakeSuggestion(String suggestion) {
@@ -160,6 +162,8 @@ public class CMDGame {
 		
 		try {
 			game.moveTowards(room);
+			
+			
 			System.out.println("You moved...");	
 			//will need to refine their move info; steps taken, how far from location, etc
 		} catch (InvalidMoveException e) {

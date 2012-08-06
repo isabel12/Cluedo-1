@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 
 import CluedoGame.Board.Cell;
+import CluedoGame.Board.CorridorCell;
+import CluedoGame.Board.RoomCell;
 
 public class Player {
 
@@ -37,15 +39,34 @@ public class Player {
 	/**
 	 * IZZI
 	 * We might want to change this later to be private...?  Right now, the Board calls this method.
+	 * 
+	 * I think the CluedoGame should call this method actually.
 	 * @param position
 	 */
 	public void setPosition(Cell position) {
 		this.position = position;
 	}
 	
+	
 	public Cell getPosition(){
 		return this.position;
 	}
 	
+	public boolean inCornerRoom(){
+		if (position instanceof RoomCell){
+			RoomCell pos = (RoomCell) position;
+			return pos.hasSecretPassage();
+		}
+		return false;
+	}
+	
+	
+	public boolean onIntrigueSquare(){
+		if (position instanceof CorridorCell){
+			CorridorCell pos = (CorridorCell) position;
+			return pos.isIntrigue();
+		}
+		return false;
+	}
 	
 }

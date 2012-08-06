@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Random;
 
 import CluedoGame.Board.Board;
+import CluedoGame.Board.Cell;
+import CluedoGame.Board.CorridorCell;
 import CluedoGame.Board.RoomCell;
 
 /**
@@ -29,18 +31,36 @@ public class CluedoGame {
 	private Player currentPlayer;
 
 	//current turn takers variables. Have they rolled, made a murder suggestion, how many steps left, etc.
-	private boolean hasRolled, hasSuggested, hasMovedThroughRoom;
-	private int stepsLeft;
+	private boolean hasRolled;
+	private int stepsRemaining;  //<--- this should be cleared when we enter a room
+	private boolean inRoom;
+
+	
+	private boolean turnFinished; // <------madeSuggestion isn't necessary, because will go straight to turnFinished.
 	
 	
 	//need to store murder room/ weapon/ character in some data structure
 	//some data structure here
+	List<Card> solution; // <--------------- this could be just a list in a set format (Character, weapon, room)
 
 	//the current board
 	private Board board;
 
+	
+	
+
+	
+	
+
 
 	//more data...
+	
+	
+
+
+
+	
+	
 
 
 
@@ -102,6 +122,9 @@ public class CluedoGame {
 	 * @return
 	 */
 	public Map<RoomCell, Integer> getRoomSteps(Player player) {
+		// this method will call a similar method in board to get this.
+		
+		
 		
 		return null;
 	}
@@ -135,11 +158,11 @@ public class CluedoGame {
 			throw new InvalidMoveException(currentPlayer + " has already rolled this turn");
 		} else {
 			Random random = new Random();
-			stepsLeft = (random.nextInt(6) * 2) + 1;	//maybe a static final int for #dice
+			stepsRemaining = (random.nextInt(6) * 2) + 1;	//maybe a static final int for #dice
 			
 			hasRolled = true;							//change flag to true since they've rolled now
 			
-			return stepsLeft;
+			return stepsRemaining;
 		}
 	}
 
@@ -149,8 +172,17 @@ public class CluedoGame {
 	}
 	
 	public void makeSuggestion(Character chara, Weapon weapon, Room room) throws InvalidMoveException {
-		
+		// in this method, we need to check if game is over.
 	}
+	
+	
+	public void drawIntrigueCard() throws InvalidMoveException{
+		// this will only work if the current player is on an intrigue card square, and they have rolled.
+		
+
+		// it will need to check if the game is over if the timeCards kill a player.
+	}
+	
 	
 	/**
 	 * Moves the player as close to (or inside if possible) the given room.
@@ -161,8 +193,17 @@ public class CluedoGame {
 	 */
 	public void moveTowards(Room room) throws InvalidMoveException {
 		//first need to check player has moves left/ can move at all
+		
 		//then find the shortest path to a door of the given room
+		List<Cell> path = board.getBestPathTo(currentPlayer, room);
+		
 		//then move as many steps as the player has left to that location
+		for(int i = 0; i < stepsRemaining; i++){
+			Cell square = path.get(i);
+			if (square instanceof CorridorCell){
+				// if intrigue board, only move to here (so the UI class can ask if the player wants to pick a card up)
+			}
+		}
 	}
 	
 	/**
@@ -171,11 +212,11 @@ public class CluedoGame {
 	 * @throws InvalidMoveException if player isn't in corner room or has already moved this turn
 	 */
 	public void moveSecretPassage() throws InvalidMoveException {
-		if (currentPlayer.getPosition().equals(null)) {		// filler. Need to be able to check position is a corner room
+		if (currentPlayer.inCornerRoom()) {		// filler. Need to be able to check position is a corner room
 			throw new InvalidMoveException("Current location doesn't have a secret passageway!");
-		} else if (hasMovedThroughRoom) {
+		} else if (hasRolled && stepsRemaining == 0) {  
 			throw new InvalidMoveException("Already moved this turn!");
-		} else if (hasSuggested) {
+		} else if (turnFinished) { // <---- the idea is after a suggestion, the turnFinished status is set
 			throw new InvalidMoveException("Cannot move after making a suggestion!");
 		}
 		//other checks maybe
@@ -185,4 +226,31 @@ public class CluedoGame {
 		//or
 		//board.moveSecretPassage(currentPlayer);
 	}
+	
+	/**
+	 * The idea for this method is to communicate what main stage the game is at, so the UI class can communicate with the player.
+	 * The main useful states are:
+	 * 
+	 * 1 - inCorridor, notRolled
+	 * 2 - rolled, moves remaining 
+	 * 3 - inRoom, notRolled
+	 * 4 - inCornerRoom, notRolled
+	 * 5 - turnFinished
+	 * 6 - rolled, Location is intrigue
+	 * 
+	 * @return
+	 */
+	public int getGameStatus(){
+		if (!inRoom && !hasRolled){return 1;}
+		if (hasRolled && stepsRemaining > 0){return 2;}
+		if (inRoom && !hasRolled){return 3;}
+		if (currentPlayer.inCornerRoom() && !hasRolled){return 4;}  // <--- should we let people move if they have rolled, but haven't moved?
+		if (turnFinished){return 5;}
+		//if (hasRolled && !turnFinished && )
+		
+		
+		
+		
+	}
+	
 }

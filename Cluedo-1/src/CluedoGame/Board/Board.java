@@ -123,6 +123,13 @@ public class Board {
 	// Ideas for wrapper methods
 	//=============================================================================================
 
+	
+	public List<Cell> getBestPathTo(Player currentPlayer, Room room) {
+		// TODO Auto-generated method stub
+		//This one is probably needed.
+		return null;
+	}
+	
 
 	//	QUESTION: should the paramters be a Point, instead of ints?
 	/** 
@@ -730,6 +737,9 @@ public class Board {
 		
 
 	}
+
+
+
 
 
 }
