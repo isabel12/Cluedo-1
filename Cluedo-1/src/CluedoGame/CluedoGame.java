@@ -246,7 +246,7 @@ public class CluedoGame {
 		if (inRoom && !hasRolled){return 3;}
 		if (currentPlayer.inCornerRoom() && !hasRolled){return 4;}  // <--- should we let people move if they have rolled, but haven't moved?
 		if (turnFinished){return 5;}
-		//if (hasRolled && !turnFinished && )
+		//if (hasRolled && !turnFinished && )  
 		
 		
 		
