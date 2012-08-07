@@ -16,7 +16,7 @@ import java.util.Set;
  * 
  * @author Izzi
  */
-public abstract class Cell {
+public abstract class Cell implements Square {
 	protected Map<Point,Cell> neighbours;
 	List<Point> position;
 
@@ -88,11 +88,4 @@ public abstract class Cell {
 		position.addAll(this.position);
 		return positions;
 	}
-	
-
-	
-	
-	
-
-	
 }

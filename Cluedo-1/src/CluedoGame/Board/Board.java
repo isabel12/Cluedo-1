@@ -30,7 +30,7 @@ import CluedoGame.Room;
  * which the Player is responsible for remembering.
  * 
  * 
- * NOTE:  I've implemented it so that Point (x,y) is (row, col).  This may need changing!!!
+ * NOTE:  I've implemented it so that Point (x,y) is (row, col).  This may need changing!!!  Change this to match x,y!!!!!!
  * 
  * 
  * @author Izzi
@@ -96,7 +96,7 @@ public class Board {
 	 * @param player
 	 * @param newPos
 	 */
-	private void setNewPlayerPosition(Player player, Cell newPos){
+	public void setNewPlayerPosition(Player player, Cell newPos){  // <-- change this to Square!
 		Character character = player.getCharacter();
 		
 		// set current Cell to empty

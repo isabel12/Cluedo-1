@@ -1,0 +1,77 @@
+reset variables!!!!!! when game changes the  player
+
+end turn - turnFinished var
+---------------------------
+Rolled and no moves left and not on intrugue square
+If they've made a suggestion
+If they've picked up and intrugue.
+And not game finished.
+Used secret passage
+Once entered a room
+cannot currently be refuting
+
+
+
+rollDice
+--------
+you can only roll if haven't rolled.
+turn isn't over
+game isn't over
+can't be refuting
+
+
+make suggestion
+---------------
+you can't have suggested already
+game isn't over
+you're not in a room
+can't be in refute state
+if final murder suggestion must be in pool-room
+
+
+
+draw intrigue card
+------------------
+standing on an intrugue card
+in a hallway
+if you haven't rolled and haven't moved
+can't be refuting
+
+
+
+
+
+moveTowards
+-----------
+You need to have rolled
+need moves remaining
+game hasn't ended
+can't have entered a room this turn
+can't have made suggestion
+can't be refuting
+
+
+
+
+moveSecretPassage
+-----------------
+must be in a corner room
+can't have suggested
+can't be end game
+can't have entered a room this turn
+can't be refuting
+
+
+refuteSuggestion
+----------------
+Must be in refute state
+Current refuter must have that card
+Card must have been part of suggestion
+Game mustnn't be ended
+
+
+getRefuter
+----------
+Must be in refute state
+game can't be over
+

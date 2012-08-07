@@ -7,5 +7,7 @@ package CluedoGame;
  *
  */
 public interface Card {
-
+	public boolean isWeapon();
+	public boolean isCharacter();
+	public boolean isRoom();
 }

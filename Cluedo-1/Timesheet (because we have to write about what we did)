@@ -5,9 +5,11 @@
 
 Todo over weekend
 -----------------
-Isabel - Finish Board, tidy up Cell classes!
-Troy - CMDGame and Parser, thoughts about methods needed for CluedoGame
 
+Isabel - tidy up Cell classes! Board Square blarg Sequence diagrams..?
+Troy - refine parsers logic (allow aliases for input)
+Troy - add game logic to CluedoGame
+Troy - add enums for gamestate, and fix return values
 
 
 

@@ -1,8 +1,10 @@
 package CluedoGame;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
 
 import CluedoGame.Board.Board;
@@ -22,7 +24,7 @@ import CluedoGame.Board.RoomCell;
 public class CluedoGame {
 
 	//players currently playing the game
-	private List<Player> livePlayers;
+	private Queue<Player> livePlayers;
 
 	//players who made incorrect accusation and lost
 	private List<Player> losingPlayers;
@@ -34,6 +36,7 @@ public class CluedoGame {
 	private boolean hasRolled;
 	private int stepsRemaining;  //<--- this should be cleared when we enter a room
 	private boolean inRoom;
+	private Player toRefute = null;
 
 	
 	private boolean turnFinished; // <------madeSuggestion isn't necessary, because will go straight to turnFinished.
@@ -71,7 +74,7 @@ public class CluedoGame {
 	 * @param numPlayers number of players for this game
 	 */
 	public CluedoGame(int numPlayers) {
-		livePlayers = new ArrayList<Player>();
+		livePlayers = new LinkedList<Player>();
 	}
 
 	
@@ -106,7 +109,7 @@ public class CluedoGame {
 	 * 
 	 * @return
 	 */
-	public Player getNextPlayer() {
+	public Player getCurrentPlayer() {
 		//will need a cyclic queue to store current players
 		//perhaps a queue or LinkedList, getting first, then putting at end after each turn
 		return null;	//fille for now
@@ -228,6 +231,32 @@ public class CluedoGame {
 	}
 	
 	/**
+	 * Refutes the current suggestion with the given card.
+	 * Futes from the current refuter, obtained by 
+	 * @param card 
+	 * @throws InvalidMoveException 
+	 */
+	public void refuteSuggestion(Card card) throws InvalidMoveException {
+		
+		
+		throw new InvalidMoveException("Player doesn't have that card");
+		//throw new InvalidMoveException("Given card isn't in suggestion");
+	}
+	
+	/**
+	 * Returns the player who is the only logical player who can refute suggestion.
+	 * i.e skips over players who can't refute clockwise
+	 * 
+	 * @return player to refute. null if noone can refute
+	 * @throws InvalidMoveException if not in refute state
+	 */
+	public Player getRefuter() throws InvalidMoveException {
+		return null;	//filler
+		
+		//throw InvalidMoveException("There's no suggestion to refute");
+	}
+	
+	/**
 	 * The idea for this method is to communicate what main stage the game is at, so the UI class can communicate with the player.
 	 * The main useful states are:
 	 * 
@@ -237,6 +266,7 @@ public class CluedoGame {
 	 * 4 - inCornerRoom, notRolled
 	 * 5 - turnFinished
 	 * 6 - rolled, Location is intrigue
+	 * 7 - someone has to refute
 	 * 
 	 * @return
 	 */
@@ -247,8 +277,10 @@ public class CluedoGame {
 		if (currentPlayer.inCornerRoom() && !hasRolled){return 4;}  // <--- should we let people move if they have rolled, but haven't moved?
 		if (turnFinished){return 5;}
 		//if (hasRolled && !turnFinished && )  
+		if (toRefute != null){return 7;}
+		if (hasRolled && !turnFinished && currentPlayer.onIntrigueSquare()){return 6;}
 		
-		
+		else return -1;
 		
 		
 	}

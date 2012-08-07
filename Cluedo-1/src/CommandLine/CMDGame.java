@@ -55,7 +55,7 @@ public class CMDGame {
 		while (!game.isGameOver()) {
 
 			//get the player
-			player = game.getNextPlayer();
+			player = game.getCurrentPlayer();
 			
 			// get the game state, and print message
 			
@@ -109,7 +109,6 @@ public class CMDGame {
 					System.out.println("You entered an invalid command.");
 					System.out.println("Use [help] or [print commands] for information.");
 					break;
-
 				}
 
 
@@ -136,11 +135,26 @@ public class CMDGame {
 		Weapon weapon = parser.parseWeapon(suggestion);
 		Room room = parser.parseRoom(suggestion);
 
-
 		try {
 			game.makeSuggestion(chara, weapon, room);
 
+			//get refuting player
+			//Player refuter = game.getRefuter();
+			
 			//will need logic here to iterate over players to allow refute
+			
+//			Player refuter = game.getRefuter();
+//			
+//			
+//			while(status == isRefute) {
+//				game.refute(card);
+//				
+//				
+
+			
+			
+			
+			
 		} catch (InvalidMoveException e) {
 			System.out.println(e.getMessage());
 		}
