@@ -23,13 +23,8 @@ import CluedoGame.Square;
  * The Board class is responsible for keeping track of player locations, and moving their locations when requested
  * via a valid route, and setting Players' locations for them when they are moved.
  * 
- * 
- * 
- * NOT SURE YET
- * I'm not sure if it should be responsible for setting the Player's location.  Eg.  Whether the Board is passed a player, and it gets the players character,
- * moves that character on the board, and then changes the Player's location to match its token on the board, or have the methods return the location moved to,
- * which the Player is responsible for remembering.
- * 
+ * We decided the Board would be responsible for setting the Player's location.  Eg.  The Board is passed a player, it gets the players character,
+ * moves that character on the board, and then changes the Player's location to match its token on the board.
  * 
  * NOTE:  I've implemented it so that Point (x,y) is (col, row).  
  * The map is still [row][col] (this is the only way you can really do it without running into massive problems!!)
@@ -129,7 +124,6 @@ public class Board {
 		
 		// update the Player's position
 		player.setPosition(newPos);
-		
 	}
 	
 	/**
@@ -157,13 +151,20 @@ public class Board {
 	public List<Square> getBestPathTo(Player player, Room room){
 		// get the start and goal cells
 		Cell s = (Cell)player.getPosition();
+		
+		// if room is intrigue, need to find the closest one first.
+		//TODO
+		
 		Cell g = rooms.get(room);	
 		return this.getBestPathTo(s,g);
 	}
 	
 	
+	
+	 // Not sure if this should be public or private yet.
 	/**
 	 * Returns the Square at the specified point on the board.
+	 * 
 	 * @return
 	 */
 	public Square getSquare(Point p){
@@ -176,6 +177,13 @@ public class Board {
 		
 		return map[row][col];
 		
+	}
+	
+	
+	// this will be used by CMDGame to communicate the options to the player.
+	public Map<Room, Integer> distanceToAllRooms(){
+		//TODO: 
+		return null;
 	}
 	
 	
