@@ -27,6 +27,21 @@ public enum Room implements Card {
 		public String toString(){
 			return getName();
 		}
+
+		@Override
+		public boolean isWeapon(){
+			return false;
+		}
+
+		@Override
+		public boolean isCharacter() {
+			return false;
+		}
+
+		@Override
+		public boolean isRoom() {
+			return true;
+		}
 		
 }
 	

@@ -1,0 +1,46 @@
+1. inCorridor, notRolled
+------------------------
+
+You are in the corridor at position (2,4).  Type 'roll dice' to roll the dice.
+
+
+2. rolled, moves remaining 
+-------------------------
+
+You have .. moves remaining.  Enter a move command to one of the following locations:
+
+kitchen (3 squares away)
+dining room (12 squares away)
+ball room	(6 squares away)
+intrigue (8 squares away)
+...
+
+
+3. inRoom, notRolled
+--------------------
+
+You are in the ...  You can either roll the dice, or make a suggestion.
+
+
+4. inCornerRoom, notRolled
+--------------------------
+
+You are in the ...  You can either roll the dice, make a suggestion, or use the secret passage.
+
+
+4. finished
+-----------
+
+Your main turn is over.  If you are done, type 'end turn'. 
+
+
+5. rolled, Location is intrigue
+-----------------------
+
+You have reached an intrigue square.  Would you like to pick up an intrigue card?
+
+
+6. toRefute
+------------
+
+.... needs to refute the suggestion with a card they have.

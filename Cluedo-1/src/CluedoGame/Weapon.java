@@ -10,8 +10,8 @@ package CluedoGame;
 
 	public enum Weapon implements Card {
 		Axe("Axe"),
-		BaseballBat("Baseball Bat"),
-		Candlestick("Candle Stick"),
+		BaseballBat("Baseball bat"),
+		Candlestick("Candle stick"),
 		Dumbbell("Dumbbell"),
 		Knife("Knife"),
 		Pistol("Knife"),
@@ -29,5 +29,20 @@ package CluedoGame;
 		@Override
 		public String toString(){
 			return weapon;
+		}
+		
+		@Override
+		public boolean isWeapon(){
+			return true;
+		}
+
+		@Override
+		public boolean isCharacter() {
+			return false;
+		}
+
+		@Override
+		public boolean isRoom() {
+			return false;
 		}
 	}

@@ -10,10 +10,14 @@ public enum Character implements Card {
 
 	private final String name;
 
+	
 	Character(String name){
 		this.name = name;
 	}
 
+	public String getShortName() {
+		return getName().split(" ")[1];
+	}
 	public String getName(){
 		return name;
 	}
@@ -21,5 +25,20 @@ public enum Character implements Card {
 	@Override
 	public String toString(){
 		return getName();
+	}
+	
+	@Override
+	public boolean isWeapon(){
+		return false;
+	}
+
+	@Override
+	public boolean isCharacter() {
+		return true;
+	}
+
+	@Override
+	public boolean isRoom() {
+		return false;
 	}
 }
