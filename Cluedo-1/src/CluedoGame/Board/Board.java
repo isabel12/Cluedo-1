@@ -44,6 +44,7 @@ public class Board {
 	//-----------
 	private Cell[][] map; // a 2D array of Cell objects representing the map.  Every box will contain a Cell, although room cells will be duplicated.
 	private Map<Character, Cell> startingCells;  // a map to keep track of where characters start.  I won't make a new type of Cell for now.
+	private Map<Room, Cell> rooms;
 	
 	// dimensions of the board
 	private int cols; 
@@ -57,6 +58,7 @@ public class Board {
 	
 	public Board(Collection<Player> currPlayers){
 		this.playerPos = new HashMap<Character, Cell>();
+		this.rooms = new HashMap<Room, Cell>();
 		
 		// create the board and add players
 		char[][] rawData = this.readFromFile();
@@ -65,38 +67,47 @@ public class Board {
 	}
 	
 	
-	/**
-	 * This adds the collection of players to the board, and updates the Player's position for them (not sure if this is bad style, we can change it!) 
-	 * @param currPlayers
-	 */
-	public void addPlayers(Collection<Player> currPlayers){
-		if (startingCells == null){
-			System.out.println("The board hasn't been set up yet.  Call constructBoard(char[][]) first.");
-			return;
-		}
-		
-		// initialise the set of characters
-		//---------------------------------
-		this.players = new HashSet<Character>();
-		
-		// put the characters on the board at their starting locations, and update the Player's position
-		//----------------------------------------------------------------------------------------------
-		for (Player p: currPlayers){
-			
-			// add character to list of characters playing
-			Character charac = p.getCharacter();
-			players.add(charac); 
-			
-			// set player position to their default start position.
-			Cell start = startingCells.get(charac);
-			setPlayerPosition(p, start);
-		}
-		
-	}
+
+	
+	
+
+
+	//=============================================================================================
+	// Public wrapper methods
+	//=============================================================================================
+
+	
+	//dunno about return types for move() methods yet
+	//just initial planning
+	//	/**
+	//	 * Moves character in given direction by one square. 
+	//	 * 
+	//	 * @param chara
+	//	 * @param dir
+	//	 * @return
+	//	 */
+	//	public void move(Player player, Direction dir) {
+	//		switch (dir) {
+	//		case North:
+	//			//move north
+	//			break;
+	//		case South:
+	//			//move south
+	//			break;
+	//		case East:
+	//			//move east
+	//			break;
+	//		case West:
+	//			//move west
+	//			break;
+	//		}
+	//	}
+	//	
+	
 	
 	/**
-	 * Helper method.  Changes the position of the character.  It updates the cell's 'empty' flag, 
-	 * records the character's current position, and updates the Player.
+	 * Moves the player's character to the given Square on the board.  
+	 * 
 	 * @param player
 	 * @param newPos
 	 */
@@ -121,61 +132,8 @@ public class Board {
 		
 	}
 	
-	
-
-
-	//=============================================================================================
-	// Ideas for wrapper methods
-	//=============================================================================================
-
-	
-	public List<Cell> getBestPathTo(Player currentPlayer, Room room) {
-		// TODO Auto-generated method stub
-		//This one is probably needed.
-		return null;
-	}
-	
-
-	//	QUESTION: should the paramters be a Point, instead of ints?
-	/** 
-	 * Move character to given x, y locations (or as close as possible) using the A* algorithm.
-	 * 
-	 * @param chara
-	 * @param x
-	 * @param y
-	 * @return
-	 */
-	public void move(Player player, Point p) {
-		//run A* to get best path in the form of a list of Direction from current
-		//location to end location
-		//List<Direction> path = getBestPath(player.getCharacter(), );	//need to make this method
-
-		//subtract path.size() from charas move count or something here...
-
-		//iterate over Direction, moving chara in that direction
-		//this assumes that getBestPath() will return a path that isn't blocked, etc
-		//for (Direction d: path) move(player, d);
-	}
-
-	
-	/**
-	 * Move character towards the specified room (or as close as possible) using the A* algorithm.
-	 * 
-	 * @param chara
-	 * @param room
-	 * @return
-	 */
-	public void move(Player player, Room room) {
-		//get coordinates of given door, and call move(chara, x, y);
-		//perhaps instead of using Room object, we use RoomNode or something
-		//since a few rooms have more than 1 door, so we'd need to specify that somewhere
-	}
-	
-	
 	/**
 	 * This method returns the optimum path from the player's position, and the point given.
-	 * 
-	 * Wrapper method for List<Cell> getBestPathTo(Cell s, Cell g).
 	 * 
 	 * @param player
 	 * @param p
@@ -184,15 +142,46 @@ public class Board {
 	public List<Square> getBestPathTo(Player player, Point p){
 		// get the start and goal cells
 		Cell s = (Cell)player.getPosition();
-		Cell g = this.getCell(p);	
+		Cell g = (Cell)this.getSquare(p);	
 		return this.getBestPathTo(s,g);
+	}
+	
+	/**
+	 * This method returns the optimum path from the player's position, and the room given.
+	 * If the room or the players position has multiple entrances, it will find best path between best entrances.
+	 * 
+	 * @param player
+	 * @param p
+	 * @return
+	 */
+	public List<Square> getBestPathTo(Player player, Room room){
+		// get the start and goal cells
+		Cell s = (Cell)player.getPosition();
+		Cell g = rooms.get(room);	
+		return this.getBestPathTo(s,g);
+	}
+	
+	
+	/**
+	 * Returns the Square at the specified point on the board.
+	 * @return
+	 */
+	public Square getSquare(Point p){
+		int col = p.x;
+		int row = p.y;
+		
+		if (!(row >= 0 && row < this.rows && col >= 0 && col < this.cols)){
+			throw new IllegalArgumentException("Point (col, row) is out of bounds.");
+		}
+		
+		return map[row][col];
+		
 	}
 	
 	
 	//=============================================================================================
 	// Path finding methods (woo!)
 	//=============================================================================================
-	
 	
 	/**
 	 * 
@@ -206,7 +195,7 @@ public class Board {
 	 * @param g
 	 * @return
 	 */
-	public List<Square> getBestPathTo(Cell s, Cell g){
+	private List<Square> getBestPathTo(Cell s, Cell g){
 		// to hold the best path
 		List<Square> bestPath = new ArrayList<Square>();
 		int bestSize = Integer.MAX_VALUE;
@@ -296,7 +285,7 @@ public class Board {
 	 * @param p
 	 * @return
 	 */
-	public List<Square> getBestPathTo(CorridorCell start, CorridorCell goal){
+	private List<Square> getBestPathTo(CorridorCell start, CorridorCell goal){
 		
 		// 1. initialise everything	
 		//-------------------------
@@ -413,60 +402,10 @@ public class Board {
 	
 	
 	
-	public Cell getCell(Point p){
-		int col = p.x;
-		int row = p.y;
-		
-		if (!(row >= 0 && row < this.rows && col >= 0 && col < this.cols)){
-			throw new IllegalArgumentException("Point (col, row) is out of bounds.");
-		}
-		
-		return map[row][col];
-		
-	}
-	
-	
-	
-	//dunno about return types for move() methods yet
-	//just initial planning
-	/**
-	 * Moves character in given direction by one square. 
-	 * 
-	 * @param chara
-	 * @param dir
-	 * @return
-	 */
-	public void move(Player player, Direction dir) {
-		switch (dir) {
-		case North:
-			//move north
-			break;
-		case South:
-			//move south
-			break;
-		case East:
-			//move east
-			break;
-		case West:
-			//move west
-			break;
-		}
-	}
-
-	//=============================================================================================
-	// Query methods??
-	//=============================================================================================
-
 
 	
-	
-	
-	
-	
-	
-	
 	//=============================================================================================
-	// Private methods
+	// Constructor helpers
 	//=============================================================================================
 	
 
@@ -534,6 +473,19 @@ public class Board {
 		RoomCell d = new RoomCell(Room.DiningRoom);
 		RoomCell g = new RoomCell(Room.GuestRoom);
 		RoomCell w = new RoomCell(Room.SwimmingPool);
+		
+		// add to the map from Room to Cell
+		rooms.put(Room.Spa, s);
+		rooms.put(Room.Theatre, t);
+		rooms.put(Room.LivingRoom, l);
+		rooms.put(Room.Observatory, o);
+		rooms.put(Room.Patio, p);
+		rooms.put(Room.Hall, h);
+		rooms.put(Room.Kitchen, k);
+		rooms.put(Room.DiningRoom, d);
+		rooms.put(Room.GuestRoom, g);
+		rooms.put(Room.SwimmingPool, w);
+		
 
 
 		// Put all Cells into the map, and add their positions, save starting cells
@@ -688,6 +640,37 @@ public class Board {
 				}
 			}	
 		}
+	}
+	
+	
+	
+	/**
+	 * This adds the collection of players to the board.
+	 * @param currPlayers
+	 */
+	private void addPlayers(Collection<Player> currPlayers){
+		if (startingCells == null){
+			System.out.println("The board hasn't been set up yet.  Call constructBoard(char[][]) first.");
+			return;
+		}
+		
+		// initialise the set of characters
+		//---------------------------------
+		this.players = new HashSet<Character>();
+		
+		// put the characters on the board at their starting locations, and update the Player's position
+		//----------------------------------------------------------------------------------------------
+		for (Player p: currPlayers){
+			
+			// add character to list of characters playing
+			Character charac = p.getCharacter();
+			players.add(charac); 
+			
+			// set player position to their default start position.
+			Cell start = startingCells.get(charac);
+			setPlayerPosition(p, start);
+		}
+		
 	}
 	
 

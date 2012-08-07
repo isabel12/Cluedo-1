@@ -51,13 +51,7 @@ public abstract class Cell implements Square {
 	/**
 	 * Returns an unmodifiable version of the cell's neighbour cells.
 	 */
-	public Set<Cell> getNeighbours(){
-		return Collections.unmodifiableSet(neighbours);
-	}
-	
-	public abstract Point getPosition();
-	
-	public abstract Room getRoom();
+	public Set<Cell> getNeighbours(){return Collections.unmodifiableSet(neighbours);}
 	
 	public abstract void setPosition(Point position);
 	
