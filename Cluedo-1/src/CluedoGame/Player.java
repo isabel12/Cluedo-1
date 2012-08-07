@@ -8,6 +8,7 @@ import CluedoGame.Board.Cell;
 import CluedoGame.Board.CorridorCell;
 import CluedoGame.Board.RoomCell;
 
+
 public class Player {
 
 	//their piece on the board
@@ -19,7 +20,7 @@ public class Player {
 	private List<Weapon> weaponCards;
 	
 	//location on the board maybe
-	private Cell position;    // <-------- I've changed this to Cell for now.  
+	private Square position;     
 	
 	//more data
 	
@@ -43,30 +44,22 @@ public class Player {
 	 * I think the CluedoGame should call this method actually.
 	 * @param position
 	 */
-	public void setPosition(Cell position) {
+	public void setPosition(Square position) {
 		this.position = position;
 	}
 	
 	
-	public Cell getPosition(){
+	public Square getPosition(){
 		return this.position;
 	}
 	
 	public boolean inCornerRoom(){
-		if (position instanceof RoomCell){
-			RoomCell pos = (RoomCell) position;
-			return pos.hasSecretPassage();
-		}
-		return false;
+		return this.position.isCornerRoom();
 	}
 	
 	
 	public boolean onIntrigueSquare(){
-		if (position instanceof CorridorCell){
-			CorridorCell pos = (CorridorCell) position;
-			return pos.isIntrigue();
-		}
-		return false;
+		return this.position.isIntrigueSquare();
 	}
 	
 }

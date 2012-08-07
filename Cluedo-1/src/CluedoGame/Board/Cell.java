@@ -10,82 +10,60 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import CluedoGame.Room;
+import CluedoGame.Square;
+
 /**
- * The Cell class represents a square on the board. Currently it is indexed by a set of positions (Rooms will have a set of them).
- * At the moment, it can either be a RoomCell, or a CorridorCell (entrance to a room, a corridor square, or a questionMark square).
+ * The Cell class represents a square on the board that can be occupied by a Player's piece. 
+ * It is primarily manipulated by the Board class.  The main functionality is that it has a set of neighbours to which 
+ * it can travel to, allowing the board to be represented by a graph of Cells.
+ * 
+ * It can either be a RoomCell, or a CorridorCell (which could be an entrance to a room, a corridor square, or a questionMark square).
  * 
  * @author Izzi
  */
 public abstract class Cell implements Square {
-	protected Map<Point,Cell> neighbours;
-	List<Point> position;
+	protected Set<Cell> neighbours;
 
 	/**
 	 * Super constructor - this initiates the set of neighbours
 	 */
 	public Cell() {
-		neighbours = new HashMap<Point,Cell>();
-		position = new ArrayList<Point>();
+		neighbours = new HashSet<Cell>();
 	}
-	
 	
 	/**
 	 * Adds the given cell as a neighbour.  It won't add itself or null as a neighbour.
-	 * @param cell
+	 * @param the cell to be added as the current Cell's neighbour.
+	 * @throws IllegalArgumentException if neighbour is null, or itself.
 	 */
 	public void connectTo(Cell neighbour) {
-		if (neighbour == this || neighbour == null){
-			return;
-		}
+		// check the parameters
+		if (neighbour == this)
+			throw new IllegalArgumentException("A cell cannot be it's own neighbour.");
+		if (neighbour == null)
+			throw new IllegalArgumentException("A cell cannot have null as a neighbour.");
 		
-		for (Point pos: neighbour.getPositions()){
-			neighbours.put(pos,neighbour);
-		}
+		neighbours.add(neighbour);
 	}
 
-	
+
 	/**
-	 * Returns the neighbour at the given position.  
-	 * The method currently returns null if the cell doesn't have a neighbour at the given point (Let me know if this needs to change!)
-	 * 
-	 * @param pos - the position of the neighbour
-	 * @return - the neighbour at the given point (null if not a neighbour)
+	 * Returns an unmodifiable version of the cell's neighbour cells.
 	 */
-	public Cell getNeighbour(Point pos){
-		if (neighbours.containsKey(pos)){
-			return neighbours.get(pos);
-		}
-		else {
-			return null;
-		}
-	}
-	
 	public Set<Cell> getNeighbours(){
-		Collection<Cell> coll = neighbours.values();
-		Set<Cell> neighs = new HashSet<Cell>();
-		neighs.addAll(coll);
-		return neighs;
+		return Collections.unmodifiableSet(neighbours);
 	}
-	
-	/**
-	 * Thinking I should make this abstract, so CorridorCell can't have more than one.  We'll see
-	 * @param position
-	 */
-	public abstract void addPosition(Point position);
-	
-	public abstract void setEmpty(boolean isEmpty);
 	
 	public abstract Point getPosition();
 	
+	public abstract Room getRoom();
+	
+	public abstract void setPosition(Point position);
+	
+	public abstract void setEmpty(boolean isEmpty);  	// <--- this method is used when moving the player, so needs to be accessible from Cell.
+														// I don't think we need a getEmpty() method here.  We only use it for pathfinding, and that only uses CorridorCells.
 	
 	
-	/**
-	 * Returns a set of the positions relating to the cell.
-	 * @return
-	 */
-	public Set<Point> getPositions(){
-		Set<Point> positions = new HashSet<Point>();
-		position.addAll(this.position);
-		return positions;
-	}
+	
 }
