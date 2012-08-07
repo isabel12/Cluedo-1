@@ -1,12 +1,7 @@
 package CluedoGame;
 
-import java.awt.Point;
-import java.util.Collections;
 import java.util.List;
 
-import CluedoGame.Board.Cell;
-import CluedoGame.Board.CorridorCell;
-import CluedoGame.Board.RoomCell;
 
 
 public class Player {
@@ -37,13 +32,7 @@ public class Player {
 		return this.character;
 	}
 
-	/**
-	 * IZZI
-	 * We might want to change this later to be private...?  Right now, the Board calls this method.
-	 * 
-	 * I think the CluedoGame should call this method actually.
-	 * @param position
-	 */
+
 	public void setPosition(Square position) {
 		this.position = position;
 	}

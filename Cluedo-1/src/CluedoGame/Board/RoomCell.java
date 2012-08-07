@@ -1,11 +1,7 @@
 package CluedoGame.Board;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import CluedoGame.*;
 
 
@@ -116,11 +112,12 @@ public class RoomCell extends Cell {
 	}
 	
 	/**
-	 * This method does nothing.  It may be utilised later when we need to graphically draw the board.
+	 * This method is unsupported for RoomCell.
+	 * @throws UnsupportedOperationException.
 	 */
 	@Override
 	public void setPosition(Point position) {
-		return;
+		throw new UnsupportedOperationException("A room doesn't have a position.");
 	}
 
 	/**

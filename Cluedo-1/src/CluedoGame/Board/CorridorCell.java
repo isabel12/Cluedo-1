@@ -1,8 +1,6 @@
 package CluedoGame.Board;
 
 import java.awt.Point;
-import java.util.Set;
-
 import CluedoGame.Room;
 
 /**
