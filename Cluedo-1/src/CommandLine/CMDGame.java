@@ -352,7 +352,15 @@ public class CMDGame {
 		return number;
 	}
 
-
+	private void sleep(int sleepTimer) {
+		try {
+			Thread.sleep(sleepTimer);
+		} catch (InterruptedException e) {
+			//if it fails, there is no delay between CMD prompts; no biggie
+			//just ignore
+		}
+	}
+	
 
 	public static void main(String[] args) {
 		new CMDGame();

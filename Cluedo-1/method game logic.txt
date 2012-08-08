@@ -1,10 +1,20 @@
+vars
+
+Player currentPlayer;
+
+boolean refuteMode, madeSuggestion, gameFinished, usedSecretPassage
+boolean enteredRoom, hasRolled, hasMoved, turnFinished
+int movesLeft
+
+
+
 reset variables!!!!!! when game changes the  player
 
 end turn - turnFinished var
 ---------------------------
 Rolled and no moves left and not on intrugue square
 If they've made a suggestion
-If they've picked up and intrugue.
+If they've picked up and intruge.
 And not game finished.
 Used secret passage
 Once entered a room
