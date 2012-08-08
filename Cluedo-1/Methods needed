@@ -1,0 +1,11 @@
+Need in Player class
+List<Card> player.getCards() 			//needed to list cards for CMD
+boolean player.hasCard(Card c)			//needed for testing refutes
+
+
+Need in Board class
+board.moveSecretPassage(Player p)		//moves player through secret passage
+										//can throw an exception if isn't in a room with one
+board.inRoom(Player p)					//returns true/ false if player is in any room
+board.inPoolRoom(Player p)				//returns true/ false if in pool-room
+board.getAllBestPaths(Player p)			//returns a map<Room, Integer> (or Square, etc)
