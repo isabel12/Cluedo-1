@@ -1,18 +1,20 @@
 package CluedoGame.Board;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import CluedoGame.*;
 
 
+/**
+ * This class represents a Cell that is a room.  It doesn't correspond to a position on the board, and may be connected to another room via a secret passage.
+ * 
+ * @author Izzi
+ *
+ */
 public class RoomCell extends Cell {
 	Room room;
 	RoomCell secretPassage;
-	List<CorridorCell> entrances; 
+	List<CorridorCell> entrances;
 
 	public RoomCell(Room room) {
 		super();
@@ -20,13 +22,10 @@ public class RoomCell extends Cell {
 		this.entrances = new ArrayList<CorridorCell>();
 	}
 	
-	/**
-	 * Returns the room this cell corresponds to.
-	 * @return
-	 */
-	public Room getRoom(){
-		return this.room;
-	}
+	
+	//===============================================================
+	// Required for secret passage functionality
+	//===============================================================
 	
 	/**
 	 * Sets the given room to be connected via a secret passage
@@ -37,15 +36,7 @@ public class RoomCell extends Cell {
 	}
 	
 	/**
-	 * Returns true if the RoomCell is connected to another RoomCell via a secret passage
-	 * @return
-	 */
-	public boolean hasSecretPassage(){
-		return this.secretPassage != null;
-	}
-
-	/**
-	 * Returns the RoomCell at the end of the secret passage 
+	 * Returns the Cell at the end of the secret passage 
 	 * @return
 	 * @throws - UnsupportedOperationException if the room doesn't have a secret passage <--- this can be changed, but thought it might help with debugging.
 	 */
@@ -53,44 +44,62 @@ public class RoomCell extends Cell {
 		if (this.secretPassage==null){
 			throw new UnsupportedOperationException(room + "doesn't have a secret passage.");
 		}
-		
 		return this.secretPassage;
-	}
-	
-
-	public void addEntrance(CorridorCell entrance){
-		this.entrances.add(entrance);
-	}
-	
-	public List<CorridorCell> getEntrances(){
-		return Collections.unmodifiableList(entrances);
 	}
 	
 	
 	/**
-	 * This method adds the entrance to its set of neighbours, and also to its List of entrances.
+	 * This method is needed for finding paths.  If the start and destination are rooms with more than one entrance, 
+	 * then need to check all combinations, so accessing via index is necessary.
+	 * @return
 	 */
-	@Override
-	public void connectTo(Cell entrance){
-		if (entrance == this || entrance == null){
-			return;
-		}
-		// add it as a neighbour
-		Point pos = entrance.getPosition();
-		neighbours.put(pos,entrance);
-		
-		// also add it as an entrance
-		if (entrance instanceof CorridorCell){
-			entrances.add((CorridorCell)entrance);
-		}
+	public List<CorridorCell> getEntrances(){
+		return this.entrances;	
 	}
 	
 	
+	/**
+	 * Adds the given cell as a neighbour.  It won't add itself or null as a neighbour.
+	 * This method also adds the Cell to the room's list of entrances (providing it is a CorridorCell).
+	 * 
+	 * @param the cell to be added as the current Cell's neighbour.
+	 * @throws IllegalArgumentException if neighbour is null, or itself.
+	 */
 	@Override
-	public void addPosition(Point position) {
-		if (position != null){
-			this.position.add(position);
+	public void connectTo(Cell neighbour) {
+		// check the parameters
+		if (neighbour == this)
+			throw new IllegalArgumentException("A cell cannot be it's own neighbour.");
+		if (neighbour == null)
+			throw new IllegalArgumentException("A cell cannot have null as a neighbour.");
+		
+		// add to set of neighbours
+		neighbours.add(neighbour);
+		
+		// add to set of entrances
+		if (neighbour instanceof CorridorCell){
+			entrances.add((CorridorCell) neighbour);
 		}
+	}
+	
+	//===============================================================
+	// Required for Square interface
+	//===============================================================
+	
+	/**
+	 * Returns the room this cell corresponds to.
+	 * @return
+	 */
+	public Room getRoom(){
+		return this.room;
+	}
+	
+	/**
+	 * This method does nothing - currently the game doesn't care if a room is empty or not.
+	 */
+	@Override
+	public void setEmpty(boolean isEmpty) {
+		return;
 	}
 	
 	/**
@@ -98,20 +107,51 @@ public class RoomCell extends Cell {
 	 * @throws UnsupportedOperationException.
 	 */
 	@Override
-	public void setEmpty(boolean isEmpty) {
-		throw new UnsupportedOperationException("You can't set a RoomCell to be empty/not empty.");
+	public Point getPosition() {
+		throw new UnsupportedOperationException("A room doesn't have a position.");
 	}
 	
 	/**
-	 * This may need changing!!!  Returns the first position in its set of positions.
-	 * Kind of unsupported.
+	 * This method is unsupported for RoomCell.
+	 * @throws UnsupportedOperationException.
 	 */
 	@Override
-	public Point getPosition() {
-		return position.get(0);
+	public void setPosition(Point position) {
+		throw new UnsupportedOperationException("A room doesn't have a position.");
+	}
+
+	/**
+	 * Always returns true.
+	 */
+	@Override
+	public boolean isRoom() {
+		return true;
 	}
 	
+	/**
+	 * Returns true if the RoomCell is connected to another RoomCell via a secret passage
+	 * @return
+	 */
+	public boolean isCornerRoom(){
+		return this.secretPassage != null;
+	}
 	
+	/**
+	 * Always returns false.
+	 */
+	@Override
+	public boolean isCorridor() {
+		return false;
+	}
+	
+	/**
+	 * Always returns false.
+	 */
+	@Override
+	public boolean isIntrigueSquare() {
+		return false;
+	}
+
 	/**
 	 * I've set this up for debugging purposes.  It can be changed later if necessary.
 	 */
@@ -120,9 +160,4 @@ public class RoomCell extends Cell {
 		return this.room.toString();
 	}
 
-
-
-	
-
-	
 }

@@ -1,17 +1,17 @@
 package CluedoGame;
 
 public enum Room implements Card {
-		DiningRoom("Dining Room"),
-		GuestRoom("Guest Room"),
+		DiningRoom("Dining room"),
+		GuestRoom("Guest room"),
 		Hall("Hall"),
 		Kitchen("Kitchen"),
-		LivingRoom("Living Room"),
-		Observatory("Ovservatory"),
+		LivingRoom("Living room"),
+		Observatory("Observatory"),
 		Patio("Patio"),
 		Spa("Spa"),
 		Theatre("Theatre"),
-		SwimmingPool("Swimming Pool");
-
+		SwimmingPool("Swimming pool"),
+		Corridor(""); //<--- not sure if this should have a toString name or not...
 
 		private final String room;
 
@@ -23,11 +23,6 @@ public enum Room implements Card {
 			return room;
 		}
 		
-		@Override
-		public String toString(){
-			return getName();
-		}
-
 		@Override
 		public boolean isWeapon(){
 			return false;
@@ -41,6 +36,11 @@ public enum Room implements Card {
 		@Override
 		public boolean isRoom() {
 			return true;
+		}
+		
+		@Override
+		public String toString(){
+			return getName();
 		}
 		
 }
