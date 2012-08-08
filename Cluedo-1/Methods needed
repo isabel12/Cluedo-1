@@ -1,7 +1,7 @@
 Need in Player class
 List<Card> player.getCards() 			//needed to list cards for CMD
 boolean player.hasCard(Card c)			//needed for testing refutes
-
+getRoom()								//needed when adding the persons room for a suggestion
 
 Need in Board class
 board.moveSecretPassage(Player p)		//moves player through secret passage

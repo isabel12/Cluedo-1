@@ -4,6 +4,7 @@ import java.util.InputMismatchException;
 import java.util.Map;
 import java.util.Scanner;
 
+import CluedoGame.Card;
 import CluedoGame.CluedoGame;
 import CluedoGame.InvalidMoveException;
 import CluedoGame.Player;
@@ -32,6 +33,7 @@ public class CMDGame {
 
 		//play a real game now
 		System.out.println("Starting a new game of Cluedo!");
+		sleep(1000);
 		startGame();
 	}
 
@@ -56,23 +58,24 @@ public class CMDGame {
 
 			//get the player
 			player = game.getCurrentPlayer();
-			
+
 			// get the game state, and print message
+			System.out.println(player + "'s turn!");
+			sleep(1000);
 			
-			
-
-
 			//iterate while they haven't ended their turn
-			//			while (game.isTurn(player)) {
-			while (true) {
-
+			while (game.isTurn(player)) {
+				System.out.println("What will " + player + " do? ([help] to print commands) ");
+				
 				commandStr = scan.nextLine();
-
 				command = parser.getCommand(commandStr);
 
 				switch (command) {
 				case EndTurn:
 					doEndTurn();
+					break;
+				case MakeAccusation:
+					doMakeAccusation(commandStr);
 					break;
 				case MakeSuggestion:
 					doMakeSuggestion(commandStr);
@@ -124,38 +127,74 @@ public class CMDGame {
 	//following methods called on player may either be implemented by Player or by CluedoGame
 	//We'll need to discuss that once we get to coding that a bit more
 
-
 	/**
-	 * Attempts to make a suggestion/ accusation.
-	 * Method automatically handles optional third room when accusing from pool-room.
+	 * Attempts to make a final accusation. If this is wrong, the accusing player
+	 * is eliminated from the game.
+	 * @param accusation
+	 */
+	private void doMakeAccusation(String accusation) {
+		Character chara = parser.parseCharacter(accusation);
+		Weapon weapon = parser.parseWeapon(accusation);
+		Room room = parser.parseRoom(accusation);
+		
+		try {
+			boolean success = game.makeAccusation(chara, weapon, room);
+			
+			if (success) {
+				System.out.println("Wow! You won!");
+			} else {
+				System.out.println("Oh no! \nYour accusation was wrong and now you're dead!");
+			}
+			
+		} catch (InvalidMoveException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	/**
+	 * Attempts to make a suggestion
+	 * 
 	 * @param suggestion string to be parsed with suggestion params
 	 */
 	private void doMakeSuggestion(String suggestion) {
 		Character chara = parser.parseCharacter(suggestion);
 		Weapon weapon = parser.parseWeapon(suggestion);
-		Room room = parser.parseRoom(suggestion);
 
 		try {
-			game.makeSuggestion(chara, weapon, room);
+			game.makeSuggestion(chara, weapon);
 
 			//get refuting player
-			//Player refuter = game.getRefuter();
-			
-			//will need logic here to iterate over players to allow refute
-			
-//			Player refuter = game.getRefuter();
-//			
-//			
-//			while(status == isRefute) {
-//				game.refute(card);
-//				
-//				
+			Player refuter = game.getRefuter();
 
-			
-			
-			
-			
+			if (refuter != null) {
+				System.out.println(refuter + " must refute!");
+
+				String commandStr;
+				Scanner scan = new Scanner(System.in);
+
+				//loops until the refuter gives a card that refutes
+				while (game.isRefuting()) {
+					commandStr = scan.nextLine();
+
+					//we allow the refuter to print their current cards for reference
+					if (commandStr.toLowerCase().contains("print cards")) {
+						printCards(refuter);
+					} else {
+						Card card = parser.parseCard(commandStr);
+
+						try {
+							game.refuteSuggestion(card);
+						} catch (InvalidMoveException e) {
+							//this error deals with the player gives wrong card, etc
+							System.out.println(e.getMessage());
+						}
+					}
+				}
+			}
+
+
 		} catch (InvalidMoveException e) {
+			//this error deals with a player trying to refute when there isn't anything to refute
 			System.out.println(e.getMessage());
 		}
 	}
@@ -167,17 +206,17 @@ public class CMDGame {
 	private void doMoveTowards(String roomStr) {
 		//first parse the locations given by string
 		Room room = parser.parseRoom(roomStr);
-		
+
 		if (room == null) {
 			System.out.println("You entered an invalid room.");
 		} else {
 			System.out.println("Moving towards " + room.toString());
 		}
-		
+
 		try {
 			game.moveTowards(room);
-			
-			
+
+
 			System.out.println("You moved...");	
 			//will need to refine their move info; steps taken, how far from location, etc
 		} catch (InvalidMoveException e) {
@@ -191,7 +230,21 @@ public class CMDGame {
 	private void doRoll() {		
 		try {
 			int roll = game.rollDice();
-			System.out.println("You rolled a " + roll);
+			System.out.println("You rolled " + roll + "!");
+			sleep(500);
+			
+			if (roll == 12){
+				System.out.println("Wow! You rolled perfect!");
+			} else if (roll > 8) {
+				System.out.println("Nice roll!");
+			} else if (roll > 4) {
+				System.out.println("Not bad...");
+			} else if (roll > 2) {
+				System.out.println("Aww...");
+			} else if (roll == 2) {
+				System.out.println("Bad luck! Snake-eyes!");
+			}
+			sleep(500);
 		} catch (InvalidMoveException e) {
 			System.out.println(e.getMessage());
 		}
@@ -216,7 +269,8 @@ public class CMDGame {
 	private void doEndTurn() {
 		try {
 			game.endTurn();
-			System.out.println("You end your turn.");
+			System.out.println(player + " ends their turn.");
+			sleep(1000);
 		} catch (InvalidMoveException e) {
 			System.out.println(e.getMessage());
 		}
@@ -227,7 +281,7 @@ public class CMDGame {
 	 * @param player
 	 */
 	private void printNotepad(Player player) {
-		//need to implement notebook
+		System.out.println(player + "'s notepad:");
 	}
 
 	/**
@@ -276,13 +330,17 @@ public class CMDGame {
 	 * Prints the locations and number of optimal steps relative to given player.
 	 * @param player
 	 */
-	private void printLocations(Player player) {
-		System.out.println("Locations:");
+	private void printLocations(Player player) {	
+		try {
+			System.out.println(player + "'s Locations:");
 
-		Map<RoomCell, Integer> rooms = game.getRoomSteps(player);
+			Map<RoomCell, Integer> rooms = game.getRoomSteps(player);
 
-		for (RoomCell c: rooms.keySet()) {
-			System.out.println("\t" + c.getRoom() + ", " + rooms.get(c) + " steps away."); 
+			for (RoomCell c: game.getRoomSteps(player).keySet()) {
+				System.out.println("\t" + c.getRoom() + ", " + rooms.get(c) + " steps away."); 
+			}
+		} catch (InvalidMoveException e) {
+			System.out.println(e.getMessage());
 		}
 	}
 
@@ -299,8 +357,8 @@ public class CMDGame {
 	 * @param player the player we are printing from
 	 */
 	private void printCards(Player player) {
-		System.out.println("You have:");
-		//for (Card c: player.getCards())	System.out.println("\t" + c);
+		System.out.println(player + " has:");
+		for (Card c: player.getCards())	System.out.println("\t" + c);
 	}
 
 	/**
@@ -360,7 +418,7 @@ public class CMDGame {
 			//just ignore
 		}
 	}
-	
+
 
 	public static void main(String[] args) {
 		new CMDGame();

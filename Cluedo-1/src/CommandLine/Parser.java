@@ -1,7 +1,6 @@
 package CommandLine;
 
-import java.util.List;
-
+import CluedoGame.Card;
 import CluedoGame.Character;
 import CluedoGame.Room;
 import CluedoGame.Weapon;
@@ -19,6 +18,7 @@ public class Parser {
 		RollDice,
 		MoveTowards,
 		PrintNotepad,
+		MakeAccusation,
 		MakeSuggestion,
 		SelectCard,
 		SecretPassage,
@@ -55,6 +55,10 @@ public class Parser {
 			return Command.MakeSuggestion;
 		} 
 
+		else if (str.startsWith("make accusation")) {
+			return Command.MakeAccusation;
+		}
+		
 		else if (str.startsWith("select card")) {
 			return Command.SelectCard;
 		} 
@@ -141,5 +145,31 @@ public class Parser {
 		}
 
 		return null;
+	}
+	
+	/**
+	 * Method parses the given string and returns whatever card it contains.
+	 * Works the same as calling each individual parse method, and returning a match.
+	 * Returns null if the given string doesn't contain any valid card name.
+	 * 
+	 * @param str
+	 * @return a Card of the given name, or null
+	 */
+	public Card parseCard(String str) {
+		Card card = parseCharacter(str);
+		
+		//must check for null and call parsing method again for each type
+		
+		if (card == null) {
+			card = parseWeapon(str);
+		}
+		
+		if (card == null) {
+			card = parseRoom(str);
+		}
+		
+		//if nothing matches, card will equal null here
+		
+		return card;
 	}
 }
