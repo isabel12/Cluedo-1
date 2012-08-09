@@ -41,6 +41,7 @@ public class Board {
 	//-----------
 	private Cell[][] map; // a 2D array of Cell objects representing the map.  Every box will contain a Cell, although room cells will be duplicated.
 	private Map<Character, Cell> startingCells;  // a map to keep track of where characters start.  I won't make a new type of Cell for now.
+	private Set<CorridorCell> intrigueCells;  // a set of the intrigue cells on the board
 	private Map<Room, Cell> rooms;
 	
 	// dimensions of the board
@@ -53,9 +54,13 @@ public class Board {
 	private Map<Character, Cell> playerPos; // <---------- Still not super sure about this implementation yet
 
 	
+	
+	
+	
 	public Board(Collection<Player> currPlayers){
 		this.playerPos = new HashMap<Character, Cell>();
 		this.rooms = new HashMap<Room, Cell>();
+		this.intrigueCells = new HashSet<CorridorCell>();
 		
 		// create the board and add players
 		char[][] rawData = this.readFromFile();
@@ -108,9 +113,11 @@ public class Board {
 	 * @param player
 	 * @param newPos
 	 */
-	public void setPlayerPosition(Player player, Square newPosition){  
+	public void setPlayerPosition(Player player, Square newPosition){  	
 		Character character = player.getCharacter();
 		Cell newPos = (Cell) newPosition;
+		
+		if (!playerPos.containsKey(character)){throw new IllegalArgumentException("That player isn't part of the game.");}
 		
 		// set current Cell to empty
 		Cell currPos = playerPos.get(character);
@@ -129,7 +136,10 @@ public class Board {
 	}
 	
 	/**
-	 * This method returns the optimum path from the player's position, and the point given.
+	 * This method returns the optimum path from the player's position, and the square at the point given.
+	 * If the destination room or the players position is a room with multiple entrances, it will find best path between best entrances.
+	 * 
+	 * If a path cannot be found, it will return an empty list.
 	 * 
 	 * @param player
 	 * @param p
@@ -142,10 +152,12 @@ public class Board {
 		return this.getBestPathTo(s,g);
 	}
 	
+	
 	/**
 	 * This method returns the optimum path from the player's position, and the room given.
-	 * If the room or the players position has multiple entrances, it will find best path between best entrances.
+	 * If the destination room or the players position is a room with multiple entrances, it will find best path between best entrances.
 	 * 
+	 * If a path cannot be found, it will return an empty list.
 	 * @param player
 	 * @param p
 	 * @return
@@ -153,11 +165,16 @@ public class Board {
 	public List<Square> getBestPathTo(Player player, Room room){
 		// get the start and goal cells
 		Cell s = (Cell)player.getPosition();
+		Cell g = null;
 		
-		// if room is intrigue, need to find the closest one first.
-		//TODO
+		// if room is intrigue, goal is the closest one.
+		if (room == Room.Intrigue){
+			g = this.getClosestIntrigue(player);
+		}
+		else { // otherwise get the room
+			g = rooms.get(room);		
+		}
 		
-		Cell g = rooms.get(room);	
 		return this.getBestPathTo(s,g);
 	}
 	
@@ -199,7 +216,9 @@ public class Board {
 	 * 
 	 * This method is a wrapper method for the A* search algorithm, whose heuristic getEstimate() algorithm can't handle rooms being in lots of places at once.
 	 * It takes the start cell and the goal cell, checks whether either of them are rooms, and if so, it gets all optimum paths between the room entrances, and the 
-	 * start/goal CorridorCell, picks the best one, then makes sure to include the room Cell in the list before returning.
+	 * start/goal CorridorCell, picks the best one, then makes sure to include the room Cell/s in the list before returning.
+	 * 
+	 * If there is no path, it will return an empty list.
 	 * 
 	 * @param s
 	 * @param g
@@ -224,7 +243,7 @@ public class Board {
 			for (int i = 0; i < sEntrances.size(); i++){
 				for (int j = 0; j< gEntrances.size(); j++){
 					List<Square> path = this.getBestPathTo(sEntrances.get(i), gEntrances.get(j));
-					if (path.size() < bestSize){
+					if (path != null && path.size() < bestSize){
 						bestPath = path;
 						bestSize = path.size();
 					}
@@ -246,7 +265,7 @@ public class Board {
 			// check them all, and save the path if its better than already recorded
 			for (int i = 0; i < sEntrances.size(); i++){
 				List<Square> path = this.getBestPathTo(sEntrances.get(i), goal);
-				if (path.size() < bestSize){
+				if (path != null && path.size() < bestSize){
 					bestPath = path;
 					bestSize = path.size();
 				}
@@ -266,7 +285,7 @@ public class Board {
 			// check them all, and save the path if its better than already recorded
 			for (int i = 0; i < gEntrances.size(); i++){
 				List<Square> path = this.getBestPathTo(start, gEntrances.get(i));
-				if (path.size() < bestSize){
+				if (path != null && path.size() < bestSize){
 					bestPath = path;
 					bestSize = path.size();
 				}
@@ -280,11 +299,11 @@ public class Board {
 		// d. if both are corridors:
 		//-----------------------
 		else {
-			bestPath = this.getBestPathTo((CorridorCell)s, (CorridorCell)g);
+			List<Square> path = this.getBestPathTo((CorridorCell)s, (CorridorCell)g);
+			if (path != null){bestPath = path;}
 		}
 		
-
-		return bestPath;	
+		return bestPath; //<--- this will be an empty list if no path was found	
 	}
 	
 	
@@ -368,12 +387,20 @@ public class Board {
 			c.resetPath();
 		}
 		
-		// 6. Add the Cells in order to the list from start to goal and return
+		
+		// 6. check that the goal was reached (reverser will only contain 'goal') if it wasn't
+		//---------------------------------------------------------------------------------
+		if (reverser.size()==1){return null;}
+		
+		
+		// 7. Add the Cells in order to the list from start to goal and return
 		//--------------------------------------------------------------------
-		while(!reverser.isEmpty()){
-			path.add(reverser.pop());
-		}
-		return path;
+		
+			while(!reverser.isEmpty()){
+				path.add(reverser.pop());
+			}
+			return path;
+		
 	}
 	
 	
@@ -401,8 +428,33 @@ public class Board {
 		return (Math.abs(sx - gx) + Math.abs(sy - gy)); 
 	}
 	
-	
-	
+
+	/**
+	 * This is a private method that returns the closest intrigue square to the given player.
+	 * @param p
+	 * @return - returns null if no intrigue square is accessible.
+	 */
+	private Cell getClosestIntrigue(Player p){
+		List<Square> bestPath = null;
+		int bestDistance = Integer.MAX_VALUE;
+		
+		// go through and find the smallest path between current position and all the intrigue squares
+		for(CorridorCell intr: intrigueCells){
+			List<Square> path = this.getBestPathTo(this.playerPos.get(p.getCharacter()), intr);
+			if (path.size() > 0 && path.size() < bestDistance){
+				bestPath = path;
+				bestDistance = path.size();
+			}
+		}
+		
+		// as long as a path was found, return the ingrigue square at the end.
+		if (bestPath != null){
+			return (Cell)bestPath.get(bestDistance-1);
+		}
+		
+		// otherwise return null
+		return null;
+	}
 
 	
 	//=============================================================================================
@@ -528,6 +580,7 @@ public class Board {
 				case '?': // intrigue square
 					map[i][j] = new CorridorCell(true);	
 					map[i][j].setPosition(new Point(j,i));	
+					this.intrigueCells.add((CorridorCell)map[i][j]);
 					break;
 				default: // otherwise assume its a corridor, starting point, or entrance
 					map[i][j] = new CorridorCell(false);
