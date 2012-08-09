@@ -62,11 +62,11 @@ public class CMDGame {
 			// get the game state, and print message
 			System.out.println(player + "'s turn!");
 			sleep(1000);
-			
+
 			//iterate while they haven't ended their turn
 			while (game.isTurn(player)) {
 				System.out.println("What will " + player + " do? ([help] to print commands) ");
-				
+
 				commandStr = scan.nextLine();
 				command = parser.getCommand(commandStr);
 
@@ -117,7 +117,10 @@ public class CMDGame {
 
 			}
 		}
-
+		//game has finished
+		
+		System.out.println("Congratulations " + game.getWinner() + "!");
+		System.out.println("You have won this game of Cluedo!");
 	}
 
 
@@ -136,21 +139,21 @@ public class CMDGame {
 		Character chara = parser.parseCharacter(accusation);
 		Weapon weapon = parser.parseWeapon(accusation);
 		Room room = parser.parseRoom(accusation);
-		
+
 		try {
 			boolean success = game.makeAccusation(chara, weapon, room);
-			
+
 			if (success) {
 				System.out.println("Wow! You won!");
 			} else {
 				System.out.println("Oh no! \nYour accusation was wrong and now you're dead!");
 			}
-			
+
 		} catch (InvalidMoveException e) {
 			System.out.println(e.getMessage());
 		}
 	}
-	
+
 	/**
 	 * Attempts to make a suggestion
 	 * 
@@ -171,6 +174,8 @@ public class CMDGame {
 
 				String commandStr;
 				Scanner scan = new Scanner(System.in);
+				
+				Card refuteCard = null;
 
 				//loops until the refuter gives a card that refutes
 				while (game.isRefuting()) {
@@ -180,16 +185,24 @@ public class CMDGame {
 					if (commandStr.toLowerCase().contains("print cards")) {
 						printCards(refuter);
 					} else {
-						Card card = parser.parseCard(commandStr);
+						refuteCard = parser.parseCard(commandStr);
 
 						try {
-							game.refuteSuggestion(card);
+							game.refuteSuggestion(refuteCard);
 						} catch (InvalidMoveException e) {
 							//this error deals with the player gives wrong card, etc
 							System.out.println(e.getMessage());
 						}
 					}
 				}
+				
+				//player has successfully refuted with refuteCard
+				System.out.println(refuter + " successfully refuted with " + refuteCard);
+				sleep(1000);
+			} else {
+				//the refuter was null which means nobody can refute
+				System.out.println("Nobody could refute that!");
+				sleep(1000);
 			}
 
 
@@ -204,21 +217,13 @@ public class CMDGame {
 	 * @param location a string 
 	 */
 	private void doMoveTowards(String roomStr) {
-		//first parse the locations given by string
-		Room room = parser.parseRoom(roomStr);
-
-		if (room == null) {
-			System.out.println("You entered an invalid room.");
-		} else {
-			System.out.println("Moving towards " + room.toString());
-		}
-
 		try {
-			game.moveTowards(room);
-
-
-			System.out.println("You moved...");	
-			//will need to refine their move info; steps taken, how far from location, etc
+			Room room = parser.parseRoom(roomStr);
+			game.moveTowards(room);		
+			System.out.println("Moving towards " + room.toString());
+			sleep(1500);
+			//not actually true. Need to get current location.
+			System.out.println("You moved to " + room.toString());
 		} catch (InvalidMoveException e) {
 			System.out.println(e.getMessage());
 		}
@@ -232,13 +237,13 @@ public class CMDGame {
 			int roll = game.rollDice();
 			System.out.println("You rolled " + roll + "!");
 			sleep(500);
-			
+
 			if (roll == 12){
 				System.out.println("Wow! You rolled perfect!");
 			} else if (roll > 8) {
 				System.out.println("Nice roll!");
 			} else if (roll > 4) {
-				System.out.println("Not bad...");
+				System.out.println("Not bad!");
 			} else if (roll > 2) {
 				System.out.println("Aww...");
 			} else if (roll == 2) {

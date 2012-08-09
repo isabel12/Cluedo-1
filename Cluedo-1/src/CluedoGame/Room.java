@@ -11,7 +11,7 @@ public enum Room implements Card {
 		Spa("Spa"),
 		Theatre("Theatre"),
 		SwimmingPool("Swimming pool"),
-		Corridor(""); //<--- not sure if this should have a toString name or not...
+		Corridor("Corridor");
 
 		private final String room;
 

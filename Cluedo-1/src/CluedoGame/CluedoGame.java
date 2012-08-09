@@ -52,7 +52,9 @@ public class CluedoGame {
 
 	//solution contains 3 items. Do as a list for easy access to list.contains()
 	private List<Card> solution;
-
+	
+	//once game is over, winner is stored here
+	private Player winner;
 
 	//the current board
 	private Board board;
@@ -149,8 +151,7 @@ public class CluedoGame {
 			livePlayers.add(p);
 		}
 
-
-		//		to test players are being alocated cards properly
+		//to test players are being alocated cards properly
 		//		for (Player p: allPlayers) {
 		//			System.out.println("\n" + p + " has:");
 		//			for (Card c: p.getCards()) {
@@ -174,14 +175,22 @@ public class CluedoGame {
 		return livePlayers.size() == 1 || gameFinished;
 	}
 
-
 	/**
-	 * Returns true if it currently the given players turn.
+	 * Returns the winner of the game, or null if the game is still in progress.
+	 * 
+	 * @return the winner, or null
+	 */
+	public Player getWinner() {
+		return winner;
+	}
+	
+	/**
+	 * Returns true if it is currently the given players turn.
 	 * @param player
 	 * @return 
 	 */
 	public boolean isTurn(Player player) {
-		return currentPlayer.equals(player);
+		return currentPlayer != null && currentPlayer.equals(player);
 	}
 
 	/**
@@ -212,10 +221,10 @@ public class CluedoGame {
 	 * @return
 	 */
 	public Map<RoomCell, Integer> getRoomSteps(Player player) throws InvalidMoveException {
-		if (!livePlayers.contains(player)) {
-			throw new InvalidMoveException("Cannot get best paths for a dead player!");
-		} else if (gameFinished) {
+		if (gameFinished) {
 			throw new InvalidMoveException("Cannot get best paths after game is finished!");
+		} else if (!livePlayers.contains(player)) {
+			throw new InvalidMoveException("Cannot get best paths for a dead player!");
 		}
 
 		//should be okay to return best path now
@@ -231,22 +240,20 @@ public class CluedoGame {
 	 * @throws InvalidMoveException if the player isn't allowed to end their turn
 	 */
 	public void endTurn() throws InvalidMoveException {
-
 		//will need other checks
-		if (!hasRolled) {
-			throw new InvalidMoveException(currentPlayer + " isn't allowed to end turn yet.");
+		if (gameFinished) {
+			throw new InvalidMoveException("Cannot end turn after game is finished!");
 		} else if (refuteMode){
 			throw new InvalidMoveException("Cannot end turn while players are refuting!");
 		} else if (turnFinished) {
 			throw new InvalidMoveException("Turn is already over!");
 		}
+		//		else if (!hasRolled) {
+		//			throw new InvalidMoveException(currentPlayer + " isn't allowed to end turn yet.");
+		//		} else 
 
-		//live players queue, then poll the next player onto currentPlayer
-
-		//reset variables
-		turnFinished = false;
-		hasRolled = hasSuggested = hasEnteredRoom = hasUsedSecretPassage = false;
-		stepsRemaining = 0;
+		//set variables back to default for new turn
+		reinitializeNewTurn();
 
 		//exchange players
 		livePlayers.offer(currentPlayer);
@@ -258,17 +265,19 @@ public class CluedoGame {
 	 * Rolls the dice for the current player, returning the value they rolled.
 	 * This game uses 2 dice, so value is between 2-12.
 	 * @return
-	 * @throws InvalidMoveException if the player has already rolled.
+	 * @throws InvalidMoveException
 	 */
 	public int rollDice() throws InvalidMoveException {
-		if (hasRolled) {	
-			throw new InvalidMoveException(currentPlayer + " has already rolled this turn");
+		if (gameFinished) {
+			throw new InvalidMoveException("Cannot roll after game is finished!");
 		} if (turnFinished) {
 			throw new InvalidMoveException("Cannot roll after ending turn!");
-		} else if (gameFinished) {
-			throw new InvalidMoveException("Cannot roll after game is finished!");
+		} else if (hasRolled) {	
+			throw new InvalidMoveException(currentPlayer + " has already rolled this turn");
 		} else if (refuteMode) {
 			throw new InvalidMoveException("Cannot roll while refuting!");
+		} else if (hasSuggested) {
+			throw new InvalidMoveException("Cannot roll after making a suggestion!");
 		}
 
 		//should be good to roll now
@@ -278,7 +287,7 @@ public class CluedoGame {
 		}
 
 		//update variables
-		hasRolled = true;							//change flag to true since they've rolled now
+		hasRolled = true;
 
 		return stepsRemaining;
 	}
@@ -297,11 +306,14 @@ public class CluedoGame {
 			throw new InvalidMoveException("Suggestion was invalid! (null)");
 		}
 
+		//move the suggested player to that room
+		//board.move
+		
 		//clear the current suggestion, then put in new suggestion
 		suggestion.clear();
 		suggestion.add(chara);
 		suggestion.add(weapon);
-		//		suggestion.add(currrentPlayer.getRoom());
+//				suggestion.add(currrentPlayer.getRoom());
 
 		//update variables
 		hasSuggested = true;
@@ -322,15 +334,33 @@ public class CluedoGame {
 			throw new InvalidMoveException("Made an invalid accusation! (null)");
 		}
 
-		//logic here
-		//check given accusation matches the actual murder stuff
-		//if it matches, that player is declared the winner!
+		
+		//now we check their guess
 		if (solution.contains(chara) && solution.contains(weapon) && solution.contains(room)) {
-
+			//they guessed correctly. Update winner var and gameFinished var
+			gameFinished = true;
+			winner = currentPlayer;
+			
 			return true;
+		} else {
+			//they made incorrect accusation
+			
+			//add losing player to lose list
+			deadPlayers.add(currentPlayer);
+			
+			if (livePlayers.size() == 1) {
+				//last player wins be default since only one left
+				gameFinished = true;
+				winner = livePlayers.poll();
+			} else {
+				//game continues
+				
+				//get current player
+				currentPlayer = livePlayers.poll();
+				//reinitialize variables so they can take turn
+				reinitializeNewTurn();
+			}
 		}
-
-		//if not, that player loses and is removed from alivePlayers to losingPlayers
 		return false;
 	}
 
@@ -444,7 +474,7 @@ public class CluedoGame {
 			throw new InvalidMoveException("Cannot refute once game is finished!");
 		} else if (!suggestion.contains(card)) {
 			throw new InvalidMoveException("Card was not part of the suggestion!");
-		} else if (toRefute.hasCard(card)) {
+		} else if (!toRefute.hasCard(card)) {
 			throw new InvalidMoveException("Refuter doesn't have that card!");
 		}
 
@@ -476,7 +506,7 @@ public class CluedoGame {
 		//the % just makes it wrap around when the index goes past 
 		//it gets the player just after currentPlayer, then the next, all around till back at currentPlayer
 		for (int i = (index + 1) % allPlayers.size(); i != index; i = (i + 1) % allPlayers.size()) {
-			for (Card c: solution) {
+			for (Card c: suggestion) {
 				if (allPlayers.get(i).hasCard(c)) {
 					//the player has the given card!
 					toRefute = allPlayers.get(i);
@@ -519,8 +549,16 @@ public class CluedoGame {
 		if (hasRolled && !turnFinished && currentPlayer.onIntrigueSquare()){return 6;}
 
 		else return -1;
-
-
 	}
-
+	
+	/**
+	 * Method resets variables relating to an individual location back to default.
+	 * Called from endTurn() after a succesfull endTurn() call, and makeAccusation() 
+	 * when a player gives an incorrect accusation but the game continues.
+	 */
+	private void reinitializeNewTurn() {
+		//reset variables
+		turnFinished = hasUsedSecretPassage = hasRolled = hasSuggested = hasEnteredRoom = false;
+		stepsRemaining = 0;
+	}
 }

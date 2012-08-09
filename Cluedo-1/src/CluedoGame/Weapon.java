@@ -14,8 +14,8 @@ package CluedoGame;
 		Candlestick("Candle stick"),
 		Dumbbell("Dumbbell"),
 		Knife("Knife"),
-		Pistol("Knife"),
-		Poison("Prison"),
+		Pistol("Pistol"),
+		Poison("Poison"),
 		Rope("Rope"),
 		Trophy("Trophy");
 		

@@ -1,5 +1,7 @@
 package CommandLine;
 
+import java.util.Scanner;
+
 import CluedoGame.Card;
 import CluedoGame.Character;
 import CluedoGame.Room;
@@ -104,10 +106,8 @@ public class Parser {
 	 * @return the enum for the Weapon, or null if not in string
 	 */
 	public Weapon parseWeapon(String str) {
-		str = str.toLowerCase();
-
 		for (Weapon w: Weapon.values()) {
-			if (str.contains(w.toString().toLowerCase())) return w;
+			if (matches(str, w.toString())) return w;
 		}
 
 		return null;
@@ -121,10 +121,14 @@ public class Parser {
 	 * @return the enum for the Room, or null if not in string
 	 */
 	public Room parseRoom(String str) {
-		str = str.toLowerCase();
-
 		for (Room r: Room.values()) {
-			if (str.contains(r.toString().toLowerCase())) return r;
+			//we need to remove "room" from the given room because it matches a lot of rooms
+			//we only search for things that uniquely identify the room (e.g "dining")
+			//since we are searching for substrings
+			String rStr = r.toString().toLowerCase();
+			if (rStr.contains(" room")) rStr = rStr.split(" ")[0];
+			
+			if (matches(str, rStr)) return r;
 		}
 
 		return null;
@@ -138,10 +142,8 @@ public class Parser {
 	 * @return the enum for the Character, or null if not in string
 	 */
 	public Character parseCharacter(String str) {
-		str = str.toLowerCase();
-
 		for (Character c: Character.values()) {
-			if (str.contains(c.toString().toLowerCase())) return c;
+			if (matches(str, c.toString())) return c;
 		}
 
 		return null;
@@ -171,5 +173,36 @@ public class Parser {
 		//if nothing matches, card will equal null here
 		
 		return card;
+	}
+	
+	/**
+	 * Checks if any of the individual words in match is contained in string, disregarding case
+	 * Eg string = scarlett, match = "Kasandra Scarlet" would return true.
+	 * 
+	 * Method is helpful to make the game easier to interact with through command line.
+	 * 
+	 * @param string
+	 * @param match
+	 * @return
+	 */
+	private boolean matches(String string, String match) {
+		string = string.toLowerCase();
+		match = match.toLowerCase();
+		
+		for (String s: match.split(" ")) {
+			if (string.contains(s)) return true;
+		}
+		
+		return false;
+	}
+	
+	public static void main(String[] args) {
+		Scanner scan = new Scanner(System.in);
+		Parser parser = new Parser();
+		
+		while (true) {
+			Weapon c = parser.parseWeapon(scan.nextLine());
+			System.out.println("lol:" +  c);
+		}
 	}
 }
