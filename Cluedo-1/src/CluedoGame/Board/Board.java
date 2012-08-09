@@ -213,6 +213,7 @@ public class Board {
 	
 	/**
 	 * This method returns a map containing the moves it would take the player to reach each room on the board.
+	 * If there is no path to the room, the distance will be -1.
 	 * @param player
 	 * @return
 	 */
