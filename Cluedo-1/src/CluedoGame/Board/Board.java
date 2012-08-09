@@ -1,3 +1,4 @@
+
 package CluedoGame.Board;
 
 import java.awt.Point;
@@ -18,6 +19,7 @@ import CluedoGame.Character;
 import CluedoGame.Player;
 import CluedoGame.Room;
 import CluedoGame.Square;
+import CluedoGame.Weapon;
 
 /**
  * The Board class is responsible for keeping track of player locations, and moving their locations when requested
@@ -204,6 +206,7 @@ public class Board {
 	 * @return
 	 */
 	private List<Square> getBestPathTo(Cell s, Cell g){
+		
 		// to hold the best path
 		List<Square> bestPath = new ArrayList<Square>();
 		int bestSize = Integer.MAX_VALUE;
@@ -228,7 +231,7 @@ public class Board {
 				}
 			}
 			// add start room and goal room back into the final list
-			bestPath.set(0, start);
+			bestPath.add(0, start);
 			bestPath.add(goal);	
 		}
 		
@@ -249,7 +252,7 @@ public class Board {
 				}
 			}
 			// add start room back into the final list
-			bestPath.set(0, start);
+			bestPath.add(0, start);
 		}
 		
 		
@@ -299,20 +302,9 @@ public class Board {
 		//-------------------------
 		PriorityQueue<CellPathObject> fringe = new PriorityQueue<CellPathObject>();
 		List<Square> path = new ArrayList<Square>();
-		int bestToGoal = Integer.MAX_VALUE;
-		Set<CorridorCell> pathMarked = new HashSet<CorridorCell>();
-		
-		// make a map that records best path to all Cells so far (initialized high)
-		Map<Cell, Integer> bestPathTo = new HashMap<Cell, Integer>();
-		for(int i = 0; i < rows; i++){
-			for (int j = 0; j < cols; j++){	
-				Cell c = map[i][j];
-				if (c instanceof CorridorCell){
-					bestPathTo.put(c, Integer.MAX_VALUE);
-				}
-			}
-		}
-			
+		Set<CorridorCell> visited = new HashSet<CorridorCell>();
+
+				
 		// 2. put start on the fringe
 		//---------------------------
 		fringe.add(new CellPathObject(start, null, 0, this.getEstimate(start, goal)));
@@ -323,35 +315,36 @@ public class Board {
 		while(fringe.size() != 0){
 			// get next best node
 			CellPathObject nextBest = fringe.poll();
+			CorridorCell cell = nextBest.getCell();
 			
-			// if this route is shorter than the one recorded to this cell
-			if(nextBest.getCostToHere() < bestPathTo.get(nextBest.getCell())){
-				CorridorCell cell = nextBest.getCell();
-				// mark the path between them, record the shorter route, and add to list of cells that have been changed
-				cell.setPathFrom(nextBest.getFrom()); 
-				bestPathTo.put(cell, nextBest.getCostToHere());
-				pathMarked.add(cell);
+			// if the cell hasn't been visited yet
+			if(!visited.contains(cell)){
+				// mark node as visited
+				visited.add(cell);
+				cell.setPathFrom(nextBest.getFrom());
 				
-				// break if we have reached the goal
-				if(cell == goal){
-					break; 
+				// if cell == goal, break
+				if (cell.equals(goal)){
+					break;
 				}
 				
-				// add all neighbours whose paths are better than recorded, and less than best to goal, and empty.
-				int toNeigh = nextBest.getCostToHere() + 1;
-				for(Cell n: cell.getNeighbours()){
-					if (n instanceof CorridorCell){
-						CorridorCell neigh = (CorridorCell)n;
-						if (toNeigh < bestPathTo.get(neigh) && toNeigh < bestToGoal && neigh.isEmpty()){
-							int total = toNeigh + this.getEstimate(neigh, goal);
-							fringe.add(new CellPathObject(neigh, cell, toNeigh, total));
-							// if the neighbour is the goal, record new best time
-							if (neigh == goal){
-								bestToGoal = toNeigh;
-							}
-						}
+				// add cell's neighbours to the fringe (if they aren't visited)
+				for (Cell c: cell.getNeighbours()){
+					if (c instanceof CorridorCell && !visited.contains(c) && ((CorridorCell) c).isEmpty()){
+						CorridorCell neigh = (CorridorCell)c;
+						
+						// work out how far to the neighbour
+						int costToNeigh = nextBest.getCostToHere() + 1;
+						
+						// work out how far to end
+						int estTotal = costToNeigh + this.getEstimate(neigh, goal);
+						
+						// add neighbour to fringe
+						fringe.add(new CellPathObject(neigh, cell, costToNeigh, estTotal));	
 					}
+						
 				}
+				
 			}	
 		}	
 		// when we get to here, we have found the shortest path.  
@@ -371,7 +364,7 @@ public class Board {
 		
 		// 5. clear the paths recorded in all the cells
 		//------------------------------------------		
-		for(CorridorCell c: pathMarked){
+		for(CorridorCell c: visited){
 			c.resetPath();
 		}
 		
@@ -534,7 +527,7 @@ public class Board {
 					break;		
 				case '?': // intrigue square
 					map[i][j] = new CorridorCell(true);	
-					map[i][j].setPosition(new Point(i,j));	
+					map[i][j].setPosition(new Point(j,i));	
 					break;
 				default: // otherwise assume its a corridor, starting point, or entrance
 					map[i][j] = new CorridorCell(false);
@@ -629,24 +622,38 @@ public class Board {
 	private void connectCorridors(CorridorCell corridor){
 		// get coordinates of corridor
 		Point position = corridor.getPosition();
-		int x = position.x;
-		int y = position.y;
+		int row = position.y;
+		int col = position.x;
 		
 		// for each Point (i,j) surrounding corridor:
-		for (int i = x-1; i <= x+1; i++){
-			for (int j = y-1; j <= y+1; j++){
-				boolean withinBounds = i>=0 && i<this.rows && j>=0 && j<this.cols;
-				// as long as (i,j) is within bounds of the board AND
-				// the Cell at that pos is a CorridorCell AND
-				// the cell isn't itself, then connect that cell to 'corridor' 
-				if (withinBounds){
-					Cell other = map[i][j];
-					if (other instanceof CorridorCell && other != corridor){
-						corridor.connectTo(other);
-						other.connectTo(corridor);
-					}
-				}
-			}	
+		// as long as (row, col) is within bounds of the board AND
+		// the Cell at that pos is a CorridorCell AND
+		// the cell isn't itself, then connect that cell to 'corridor' 
+		
+		withinBoundsAndCorridor(corridor, row, col+1);
+		withinBoundsAndCorridor(corridor, row, col-1);
+		withinBoundsAndCorridor(corridor, row+1, col);
+		withinBoundsAndCorridor(corridor, row-1, col);
+		
+	}
+	
+	/**
+	 * Helper method for connectCorridors - returns true if the given coordinates are 
+	 * on the map and point to a CorridorCell.
+	 * @param row
+	 * @param col
+	 * @return
+	 */
+	private void withinBoundsAndCorridor(Cell toConnect, int row, int col){
+		// as long as (row, col) is within bounds of the board AND
+		// the Cell at that pos is a CorridorCell AND
+		// the cell isn't itself, then connect that cell to 'corridor' 
+		if(row>=0 && row<this.rows && col>=0 && col<this.cols){
+			Cell other = map[row][col];
+			if (other instanceof CorridorCell && other != toConnect){
+				toConnect.connectTo(other);
+				other.connectTo(toConnect);
+			}
 		}
 	}
 	
@@ -656,7 +663,7 @@ public class Board {
 	 * This adds the collection of players to the board.
 	 * @param currPlayers
 	 */
-	private void addPlayers(Collection<Player> currPlayers){
+	public void addPlayers(Collection<Player> currPlayers){
 		if (startingCells == null){
 			System.out.println("The board hasn't been set up yet.  Call constructBoard(char[][]) first.");
 			return;
@@ -681,6 +688,34 @@ public class Board {
 		
 	}
 	
+	
+	/**
+	 * Returns a char array representation of the map, with the path given drawn in asterisks
+	 * @param pathToDraw
+	 * @return
+	 */
+	public char[][] drawPath(List<Square> pathToDraw){
+		char[][] path = this.readFromFile();
+		
+		for(Square c: pathToDraw){
+			if (c instanceof CorridorCell){
+				Point p = c.getPosition();
+				
+				path[p.y][p.x] = '*';
+			}
+		}
+		
+		for (int i = 0; i < rows; i++){
+			for (int j = 0; j < cols; j++){
+				System.out.print(path[i][j]);
+			}
+			System.out.println();
+		}
+		
+		
+		return path;	
+	}
+	
 
 	/**
 	 * Enum for use with Move() methods, and specifying direction in general.
@@ -699,30 +734,42 @@ public class Board {
 	public static void main(String[] args){
 		
 		// create a set of players
-		Set<Player> players = new HashSet<Player>();	
-		Player p1 = new Player(Character.Scarlett);
-		Player p2 = new Player(Character.Green);
+		Set<Player> players = new HashSet<Player>();
+		
+		List<Weapon> weapon = new ArrayList<Weapon>();
+		List<Room> room = new ArrayList<Room>();
+		List<Character> chara = new ArrayList<Character>();
+		
+		
+		Player p1 = new Player(Character.Scarlett, chara, weapon, room );
+		Player p2 = new Player(Character.Green, chara, weapon, room);
+		Player p3 = new Player(Character.Peacock, chara, weapon, room);
 		players.add(p1);
 		players.add(p2);
+		players.add(p3);
 		
 		// create the board
 		Board b = new Board(players);
 		
-		System.out.println("done!");
-		
-		
+
 		// testing pathfinding
+		List<Square> path = b.getBestPathTo(b.map[28][0], b.map[0][24]);
+		b.drawPath(path);
 		
-		List<Square> path = b.getBestPathTo(p2, new Point(11,9));
+
+		b.setPlayerPosition(p1, b.map[14][18]);
+		b.setPlayerPosition(p2, b.map[14][9]);
+		b.setPlayerPosition(p3, b.map[14][8]);
+
+		path = b.getBestPathTo(b.map[28][0], b.map[0][24]);
+		b.drawPath(path);
 		
-		for(Square s: path){
-			System.out.println(s);
+		
+		for(Square c: path){
+			System.out.print(c + " " );
 		}
+		
 
 	}
-
-
-
-
 
 }
