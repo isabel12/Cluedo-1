@@ -41,10 +41,7 @@ public class Player {
 		allCards.addAll(roomCards);
 	}
 
-	/**
-	 * Returns the Character the Player is playing as.
-	 * @return
-	 */
+
 	public Character getCharacter() {
 		return this.character;
 	}
@@ -63,6 +60,9 @@ public class Player {
 		return this.position.isCornerRoom();
 	}
 	
+	public boolean inRoom(){
+		return this.position.isRoom();
+	}
 	
 	public boolean onIntrigueSquare(){
 		return this.position.isIntrigueSquare();
@@ -75,6 +75,23 @@ public class Player {
 	
 	public boolean hasCard(Card c) {
 		return allCards.contains(c);
+	}
+	
+	/**
+	 * Two players are equal if their characters are equal.
+	 */
+	@Override
+	public boolean equals(Object o){
+		if (o instanceof Player){
+			Player other = (Player) o;
+			return this.getCharacter().equals(other.getCharacter());
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode(){
+		return this.character.hashCode();
 	}
 	
 	public String toString() {

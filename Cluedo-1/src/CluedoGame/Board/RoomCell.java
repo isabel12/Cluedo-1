@@ -40,7 +40,7 @@ public class RoomCell extends Cell {
 	 * @return
 	 * @throws - UnsupportedOperationException if the room doesn't have a secret passage <--- this can be changed, but thought it might help with debugging.
 	 */
-	public Cell getSecretPassageDestination(){
+	public Cell getSecretPassageDest(){
 		if (this.secretPassage==null){
 			throw new UnsupportedOperationException(room + "doesn't have a secret passage.");
 		}

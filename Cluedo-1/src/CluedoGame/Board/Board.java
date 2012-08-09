@@ -42,7 +42,8 @@ public class Board {
 	private Cell[][] map; // a 2D array of Cell objects representing the map.  Every box will contain a Cell, although room cells will be duplicated.
 	private Map<Character, Cell> startingCells;  // a map to keep track of where characters start.  I won't make a new type of Cell for now.
 	private Set<CorridorCell> intrigueCells;  // a set of the intrigue cells on the board
-	private Map<Room, Cell> rooms;
+	private Map<Room, Cell> rooms;				// a map from 'Room' to cell
+	private final Room finalRoom = Room.SwimmingPool;  // the final room
 	
 	// dimensions of the board
 	private int cols; 
@@ -50,62 +51,32 @@ public class Board {
 
 	// player info
 	//------------
-	private Set<Character> players; // a set of the characters on the board
-	private Map<Character, Cell> playerPos; // <---------- Still not super sure about this implementation yet
-
+	private Map<Player, Cell> playerPos; 
 	
 	
-	
-	
-	public Board(Collection<Player> currPlayers){
-		this.playerPos = new HashMap<Character, Cell>();
+	/**
+	 * Constructor for Board.  Takes a set of players as an argument.
+	 * @param currPlayers
+	 */
+	public Board(Set<Player> currPlayers){
+		// set up fields
+		this.playerPos = new HashMap<Player, Cell>();
 		this.rooms = new HashMap<Room, Cell>();
 		this.intrigueCells = new HashSet<CorridorCell>();
 		
-		// create the board and add players
+		// create the board
 		char[][] rawData = this.readFromFile();
 		this.constructBoard(rawData);
+		
+		// add the players
 		this.addPlayers(currPlayers);
 	}
 	
 	
-
-	
-	
-
-
 	//=============================================================================================
-	// Public wrapper methods
+	// Public methods
 	//=============================================================================================
 
-	
-	//dunno about return types for move() methods yet
-	//just initial planning
-	//	/**
-	//	 * Moves character in given direction by one square. 
-	//	 * 
-	//	 * @param chara
-	//	 * @param dir
-	//	 * @return
-	//	 */
-	//	public void move(Player player, Direction dir) {
-	//		switch (dir) {
-	//		case North:
-	//			//move north
-	//			break;
-	//		case South:
-	//			//move south
-	//			break;
-	//		case East:
-	//			//move east
-	//			break;
-	//		case West:
-	//			//move west
-	//			break;
-	//		}
-	//	}
-	//	
-	
 	
 	/**
 	 * Moves the player's character to the given Square on the board.  
@@ -114,13 +85,10 @@ public class Board {
 	 * @param newPos
 	 */
 	public void setPlayerPosition(Player player, Square newPosition){  	
-		Character character = player.getCharacter();
 		Cell newPos = (Cell) newPosition;
-		
-		if (!playerPos.containsKey(character)){throw new IllegalArgumentException("That player isn't part of the game.");}
-		
+				
 		// set current Cell to empty
-		Cell currPos = playerPos.get(character);
+		Cell currPos = playerPos.get(player);
 		if (currPos != null){
 			currPos.setEmpty(true);
 		}
@@ -129,11 +97,41 @@ public class Board {
 		newPos.setEmpty(false);
 		
 		// record that the character is in the new cell
-		playerPos.put(character, newPos);
+		playerPos.put(player, newPos);
 		
 		// update the Player's position
 		player.setPosition(newPos);
 	}
+	
+	
+	/**
+	 * This method moves the given player through the secret passage in the room they are in. 
+	 * 
+	 * @throws IllegalArgumentException if the player isn't in a room with a secret passage.
+	 */
+	public void useSecretPassage(Player player){
+		Cell position = playerPos.get(player);
+		
+		// check they are in a corner room
+		if ( !position.isCornerRoom()){
+			throw new IllegalArgumentException("Player " + player + "must be in a room with a secret passage.");
+		}
+
+		// if player is in corner room, move them
+		RoomCell room = (RoomCell)position;
+		setPlayerPosition(player, room.getSecretPassageDest());
+	}
+	
+	
+	/**
+	 * Returns true if the given player is located in the final room for making the final accusation.
+	 * @param player
+	 * @return - true if the player is in the final room
+	 */
+	public boolean inFinalRoom(Player player){
+		return playerPos.get(player).equals(this.finalRoom);
+	}
+	
 	
 	/**
 	 * This method returns the optimum path from the player's position, and the square at the point given.
@@ -149,7 +147,23 @@ public class Board {
 		// get the start and goal cells
 		Cell s = (Cell)player.getPosition();
 		Cell g = (Cell)this.getSquare(p);	
-		return this.getBestPathTo(s,g);
+		return this.getBestPathBetween(s,g);
+	}
+	
+	
+	/**
+	 * This method returns the optimum path from the player's position, and the Square given.
+	 * If the destination room or the players position is a room with multiple entrances, it will find best path between best entrances.
+	 * 
+	 * If a path cannot be found, it will return an empty list.
+	 * @param player
+	 * @param p
+	 * @return
+	 */
+	public List<Square> getBestPathTo(Player player, Square destination){
+		// get the start cell
+		Cell start = (Cell)player.getPosition();
+		return this.getBestPathBetween(start, (Cell)destination);
 	}
 	
 	
@@ -175,7 +189,7 @@ public class Board {
 			g = rooms.get(room);		
 		}
 		
-		return this.getBestPathTo(s,g);
+		return this.getBestPathBetween(s,g);
 	}
 	
 	
@@ -187,22 +201,60 @@ public class Board {
 	 * @return
 	 */
 	public Square getSquare(Point p){
-		int col = p.x;
-		int row = p.y;
-		
+		int col = p.x;  int row = p.y;	
+		// check Point within bounds
 		if (!(row >= 0 && row < this.rows && col >= 0 && col < this.cols)){
 			throw new IllegalArgumentException("Point (col, row) is out of bounds.");
 		}
-		
 		return map[row][col];
 		
 	}
 	
 	
-	// this will be used by CMDGame to communicate the options to the player.
-	public Map<Room, Integer> distanceToAllRooms(){
-		//TODO: 
-		return null;
+	/**
+	 * This method returns a map containing the moves it would take the player to reach each room on the board.
+	 * @param player
+	 * @return
+	 */
+	public Map<Room, Integer> getDistanceToAllRooms(Player player){	
+		Map<Room, Integer> options = new HashMap<Room, Integer>();
+		// calculate path length to each room and add to map.
+		Room[] rooms = Room.values();
+		for (int i = 0; i < rooms.length; i++){
+			Room room = rooms[i];
+			if (room != Room.Corridor){
+				List<Square> path = this.getBestPathTo(player, room);
+				options.put(room, path.size()-1);
+			}
+		}
+		return options;
+	}
+	
+	
+	
+	/**
+	 * Draw's a textual representation of the map, with the path given drawn in asterisks (also draws it for you)
+	 * @param pathToDraw
+	 * @return
+	 */
+	public void drawPath(List<Square> pathToDraw){
+		char[][] path = this.readFromFile();
+		// add asterisks into the map where the path is
+		for(Square c: pathToDraw){
+			if (c instanceof CorridorCell){
+				Point p = c.getPosition();		
+				path[p.y][p.x] = '*';
+			}
+		}
+		// draw the map (with corridors as whitespace)
+		for (int i = 0; i < rows; i++){
+			for (int j = 0; j < cols; j++){
+				if (path[i][j] == '.') {System.out.print(' ');}
+				else {System.out.print(path[i][j]);}
+			}
+			System.out.println();
+		}
+		System.out.println();
 	}
 	
 	
@@ -224,7 +276,7 @@ public class Board {
 	 * @param g
 	 * @return
 	 */
-	private List<Square> getBestPathTo(Cell s, Cell g){
+	private List<Square> getBestPathBetween(Cell s, Cell g){
 		
 		// to hold the best path
 		List<Square> bestPath = new ArrayList<Square>();
@@ -242,7 +294,7 @@ public class Board {
 			// check them all, and save the path if its better than already recorded
 			for (int i = 0; i < sEntrances.size(); i++){
 				for (int j = 0; j< gEntrances.size(); j++){
-					List<Square> path = this.getBestPathTo(sEntrances.get(i), gEntrances.get(j));
+					List<Square> path = this.getBestPathBetween(sEntrances.get(i), gEntrances.get(j));
 					if (path != null && path.size() < bestSize){
 						bestPath = path;
 						bestSize = path.size();
@@ -250,8 +302,10 @@ public class Board {
 				}
 			}
 			// add start room and goal room back into the final list
-			bestPath.add(0, start);
-			bestPath.add(goal);	
+			if (!bestPath.isEmpty()) {
+				bestPath.add(0, start);
+				bestPath.add(goal);	
+			}
 		}
 		
 		
@@ -264,14 +318,14 @@ public class Board {
 
 			// check them all, and save the path if its better than already recorded
 			for (int i = 0; i < sEntrances.size(); i++){
-				List<Square> path = this.getBestPathTo(sEntrances.get(i), goal);
+				List<Square> path = this.getBestPathBetween(sEntrances.get(i), goal);
 				if (path != null && path.size() < bestSize){
 					bestPath = path;
 					bestSize = path.size();
 				}
 			}
 			// add start room back into the final list
-			bestPath.add(0, start);
+			if (!bestPath.isEmpty()) {bestPath.add(0, start);}
 		}
 		
 		
@@ -284,14 +338,14 @@ public class Board {
 
 			// check them all, and save the path if its better than already recorded
 			for (int i = 0; i < gEntrances.size(); i++){
-				List<Square> path = this.getBestPathTo(start, gEntrances.get(i));
+				List<Square> path = this.getBestPathBetween(start, gEntrances.get(i));
 				if (path != null && path.size() < bestSize){
 					bestPath = path;
 					bestSize = path.size();
 				}
 			}
 			// add goal room back into the final list
-			bestPath.add(goal);
+			if (!bestPath.isEmpty()) {bestPath.add(goal);}
 			
 		}
 		
@@ -299,7 +353,7 @@ public class Board {
 		// d. if both are corridors:
 		//-----------------------
 		else {
-			List<Square> path = this.getBestPathTo((CorridorCell)s, (CorridorCell)g);
+			List<Square> path = this.getBestPathBetween((CorridorCell)s, (CorridorCell)g);
 			if (path != null){bestPath = path;}
 		}
 		
@@ -315,7 +369,7 @@ public class Board {
 	 * @param p
 	 * @return
 	 */
-	private List<Square> getBestPathTo(CorridorCell start, CorridorCell goal){
+	private List<Square> getBestPathBetween(CorridorCell start, CorridorCell goal){
 		
 		// 1. initialise everything	
 		//-------------------------
@@ -440,7 +494,7 @@ public class Board {
 		
 		// go through and find the smallest path between current position and all the intrigue squares
 		for(CorridorCell intr: intrigueCells){
-			List<Square> path = this.getBestPathTo(this.playerPos.get(p.getCharacter()), intr);
+			List<Square> path = this.getBestPathBetween(this.playerPos.get(p), intr);
 			if (path.size() > 0 && path.size() < bestDistance){
 				bestPath = path;
 				bestDistance = path.size();
@@ -513,7 +567,6 @@ public class Board {
 		this.map = new Cell[this.rows][this.cols];
 		this.startingCells = new HashMap<Character, Cell>();
 		
-		
 		// Make all the RoomCell objects
 		//----------------------
 		RoomCell s = new RoomCell(Room.Spa);
@@ -538,8 +591,6 @@ public class Board {
 		rooms.put(Room.DiningRoom, d);
 		rooms.put(Room.GuestRoom, g);
 		rooms.put(Room.SwimmingPool, w);
-		
-
 
 		// Put all Cells into the map, and add their positions, save starting cells
 		//-------------------------------------------------------------------------
@@ -650,7 +701,6 @@ public class Board {
 		
 		// Connect corridor squares together
 		//-----------------------------------------------------
-
 		for(int i = 0; i < rows; i++){
 			for (int j = 0; j < cols; j++){	
 				Cell c = map[i][j];
@@ -668,8 +718,9 @@ public class Board {
 	}
 	
 	
+	
 	/**
-	 * This method connects the given corridor to all 
+	 * This method connects the given corridor cell to its surrounding neighbours (if they are also corridor cells).
 	 * @param corridor
 	 */
 	private void connectCorridors(CorridorCell corridor){
@@ -678,26 +729,23 @@ public class Board {
 		int row = position.y;
 		int col = position.x;
 		
-		// for each Point (i,j) surrounding corridor:
-		// as long as (row, col) is within bounds of the board AND
-		// the Cell at that pos is a CorridorCell AND
-		// the cell isn't itself, then connect that cell to 'corridor' 
-		
-		withinBoundsAndCorridor(corridor, row, col+1);
-		withinBoundsAndCorridor(corridor, row, col-1);
-		withinBoundsAndCorridor(corridor, row+1, col);
-		withinBoundsAndCorridor(corridor, row-1, col);
-		
+		// connect each Cell at Point (i,j) surrounding corridor if possible:	
+		connectCorridorToNeighbour(corridor, row, col+1);
+		connectCorridorToNeighbour(corridor, row, col-1);
+		connectCorridorToNeighbour(corridor, row+1, col);
+		connectCorridorToNeighbour(corridor, row-1, col);	
 	}
 	
+	
+	
 	/**
-	 * Helper method for connectCorridors - returns true if the given coordinates are 
-	 * on the map and point to a CorridorCell.
+	 * Helper method for connectCorridors - it connects the given cell to it's neighbour
+	 * at position (row, col) on the board (if that point is on the board, and the cell is a corridor cell, and not itself)
 	 * @param row
 	 * @param col
 	 * @return
 	 */
-	private void withinBoundsAndCorridor(Cell toConnect, int row, int col){
+	private void connectCorridorToNeighbour(Cell toConnect, int row, int col){
 		// as long as (row, col) is within bounds of the board AND
 		// the Cell at that pos is a CorridorCell AND
 		// the cell isn't itself, then connect that cell to 'corridor' 
@@ -716,69 +764,16 @@ public class Board {
 	 * This adds the collection of players to the board.
 	 * @param currPlayers
 	 */
-	public void addPlayers(Collection<Player> currPlayers){
-		if (startingCells == null){
-			System.out.println("The board hasn't been set up yet.  Call constructBoard(char[][]) first.");
-			return;
-		}
-		
-		// initialise the set of characters
-		//---------------------------------
-		this.players = new HashSet<Character>();
-		
+	private void addPlayers(Collection<Player> currPlayers){	
 		// put the characters on the board at their starting locations, and update the Player's position
 		//----------------------------------------------------------------------------------------------
-		for (Player p: currPlayers){
-			
-			// add character to list of characters playing
-			Character charac = p.getCharacter();
-			players.add(charac); 
-			
+		for (Player p: currPlayers){		
 			// set player position to their default start position.
-			Cell start = startingCells.get(charac);
+			Cell start = startingCells.get(p);
 			setPlayerPosition(p, start);
-		}
-		
+		}	
 	}
-	
-	
-	/**
-	 * Returns a char array representation of the map, with the path given drawn in asterisks
-	 * @param pathToDraw
-	 * @return
-	 */
-	public char[][] drawPath(List<Square> pathToDraw){
-		char[][] path = this.readFromFile();
-		
-		for(Square c: pathToDraw){
-			if (c instanceof CorridorCell){
-				Point p = c.getPosition();
-				
-				path[p.y][p.x] = '*';
-			}
-		}
-		
-		for (int i = 0; i < rows; i++){
-			for (int j = 0; j < cols; j++){
-				System.out.print(path[i][j]);
-			}
-			System.out.println();
-		}
-		
-		
-		return path;	
-	}
-	
 
-	/**
-	 * Enum for use with Move() methods, and specifying direction in general.
-	 */
-	public enum Direction {
-		North,
-		South,
-		East,
-		West
-	}
 	
 	/** 
 	 * For testing :)
@@ -793,7 +788,6 @@ public class Board {
 		List<Room> room = new ArrayList<Room>();
 		List<Character> chara = new ArrayList<Character>();
 		
-		
 		Player p1 = new Player(Character.Scarlett, chara, weapon, room );
 		Player p2 = new Player(Character.Green, chara, weapon, room);
 		Player p3 = new Player(Character.Peacock, chara, weapon, room);
@@ -804,24 +798,15 @@ public class Board {
 		// create the board
 		Board b = new Board(players);
 		
-
 		// testing pathfinding
-		List<Square> path = b.getBestPathTo(b.map[28][0], b.map[0][24]);
+		List<Square> path = b.getBestPathTo(p1, Room.Intrigue);
 		b.drawPath(path);
-		
 
-		b.setPlayerPosition(p1, b.map[14][18]);
-		b.setPlayerPosition(p2, b.map[14][9]);
-		b.setPlayerPosition(p3, b.map[14][8]);
-
-		path = b.getBestPathTo(b.map[28][0], b.map[0][24]);
-		b.drawPath(path);
+		Map<Room, Integer> options = b.getDistanceToAllRooms(p1);
 		
-		
-		for(Square c: path){
-			System.out.print(c + " " );
-		}
-		
+		for (Room r: options.keySet()){
+			System.out.println(r + ": " + options.get(r));
+		}		
 
 	}
 

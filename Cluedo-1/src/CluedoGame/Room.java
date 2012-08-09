@@ -11,8 +11,8 @@ public enum Room implements Card {
 		Spa("Spa"),
 		Theatre("Theatre"),
 		SwimmingPool("Swimming pool"),
-		Corridor("Corridor"),
-		Intrigue("Intrigue square");
+		Intrigue("Intrigue square"),
+		Corridor("Corridor");
 
 		private final String room;
 

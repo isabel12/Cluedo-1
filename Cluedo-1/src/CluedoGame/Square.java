@@ -34,6 +34,13 @@ public interface Square {
 	 */
 	public boolean isIntrigueSquare();
 	
+	
+	/**
+	 * Returns true if the square is the pool room
+	 * @return
+	 */
+	public boolean isPoolRoom();
+	
 	/**
 	 * The position of the Square on the Board (col, row).  
 	 * @return - NOTE: haven't decided what this should return if its a Room.
