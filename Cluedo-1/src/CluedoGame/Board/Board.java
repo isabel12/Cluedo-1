@@ -105,6 +105,20 @@ public class Board {
 	
 	
 	/**
+	 * This method summons the Player with the given character to the given room (if they are playing).
+	 * @param chara
+	 * @param room
+	 */
+	public void summonCharacter(Character chara, Room room){
+		for (Player p: playerPos.keySet()){
+			if (p.getCharacter().equals(chara)){
+				this.setPlayerPosition(p, rooms.get(room));
+			}
+		}
+	}
+	
+	
+	/**
 	 * This method moves the given player through the secret passage in the room they are in. 
 	 * 
 	 * @throws IllegalArgumentException if the player isn't in a room with a secret passage.
