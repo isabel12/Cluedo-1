@@ -11,7 +11,7 @@ import CluedoGame.Room;
  */
 public class CorridorCell extends Cell {
 	
-	private boolean isEmpty;
+	private boolean isBlocked;
 	private boolean isIntrigue;
 	private Point position;
 	
@@ -22,7 +22,7 @@ public class CorridorCell extends Cell {
 	public CorridorCell(boolean intrigue) {
 		super();
 		this.isIntrigue = intrigue;
-		this.isEmpty = true;
+		this.isBlocked = false;
 	}
 	
 
@@ -48,8 +48,8 @@ public class CorridorCell extends Cell {
 	 * Returns whether or not the cell is currently occupied by a character.
 	 * @return
 	 */
-	public boolean isEmpty(){
-		return this.isEmpty;
+	public boolean isBlocked(){
+		return this.isBlocked;
 	}
 	
 	
@@ -62,8 +62,8 @@ public class CorridorCell extends Cell {
 	 * @param isEmpty
 	 */
 	@Override
-	public void setEmpty(boolean isEmpty){
-		this.isEmpty = isEmpty;
+	public void setBlocked(boolean isEmpty){
+		this.isBlocked = isEmpty;
 	}
 	
 	/**

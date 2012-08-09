@@ -98,7 +98,7 @@ public class RoomCell extends Cell {
 	 * This method does nothing - currently the game doesn't care if a room is empty or not.
 	 */
 	@Override
-	public void setEmpty(boolean isEmpty) {
+	public void setBlocked(boolean isEmpty) {
 		return;
 	}
 	
@@ -149,6 +149,14 @@ public class RoomCell extends Cell {
 	 */
 	@Override
 	public boolean isIntrigueSquare() {
+		return false;
+	}
+	
+	/**
+	 * Always returns false.
+	 */
+	@Override
+	public boolean isBlocked() {
 		return false;
 	}
 

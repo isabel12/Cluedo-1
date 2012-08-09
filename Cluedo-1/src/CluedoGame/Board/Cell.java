@@ -18,7 +18,7 @@ import CluedoGame.Square;
  * It is primarily manipulated by the Board class.  The main functionality is that it has a set of neighbours to which 
  * it can travel to, allowing the board to be represented by a graph of Cells.
  * 
- * It can either be a RoomCell, or a CorridorCell (which could be an entrance to a room, a corridor square, or a questionMark square).
+ * It can either be a RoomCell, or a CorridorCell (which could be an entrance to a room, a corridor square, or an intrigue square).
  * 
  * @author Izzi
  */
@@ -55,9 +55,9 @@ public abstract class Cell implements Square {
 	
 	public abstract void setPosition(Point position);
 	
-	public abstract void setEmpty(boolean isEmpty);  	// <--- this method is used when moving the player, so needs to be accessible from Cell.
+	public abstract void setBlocked(boolean isEmpty);  	// <--- this method is used when moving the player, so needs to be accessible from Cell.
 														// I don't think we need a getEmpty() method here.  We only use it for pathfinding, and that only uses CorridorCells.
-	
+	public abstract boolean isBlocked();
 	
 	
 }
