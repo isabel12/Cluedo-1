@@ -124,6 +124,7 @@ public class CluedoGame {
 		for (Weapon w: Weapon.values()) weapons.add(w);
 		for (Room r: Room.getMurderRooms()) rooms.add(r);	//excludes PoolRoom/ Corridor/ intrigue
 
+
 		//first we allocate the players main character
 		Collections.shuffle(charas);
 		for (int i = 0; i < num; i++) {

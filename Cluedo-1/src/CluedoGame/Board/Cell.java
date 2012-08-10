@@ -24,12 +24,14 @@ import CluedoGame.Square;
  */
 public abstract class Cell implements Square {
 	protected Set<Cell> neighbours;
+	protected Point position;
 
 	/**
 	 * Super constructor - this initiates the set of neighbours
 	 */
-	public Cell() {
+	public Cell(Point position) {
 		neighbours = new HashSet<Cell>();
+		this.position = position;
 	}
 	
 	/**
@@ -53,8 +55,10 @@ public abstract class Cell implements Square {
 	 */
 	public Set<Cell> getNeighbours(){return Collections.unmodifiableSet(neighbours);}
 	
-	public abstract void setPosition(Point position);
-	
+	public Point getPosition(){
+		return this.position;
+	}
+		
 	public abstract void setBlocked(boolean isEmpty);  	// <--- this method is used when moving the player, so needs to be accessible from Cell.
 														// I don't think we need a getEmpty() method here.  We only use it for pathfinding, and that only uses CorridorCells.
 	public abstract boolean isBlocked();

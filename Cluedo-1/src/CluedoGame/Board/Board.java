@@ -99,7 +99,7 @@ public class Board {
 		
 		if (playerPos.containsKey(player) && this.getBestPathTo(player, newPosition).size() == 0) {
 			throw new IllegalArgumentException(
-					"There is no valid path to the square specified.");
+					"There is no valid path to the square specified: " + newPos);
 		}
 
 		// set current Cell to empty
@@ -353,6 +353,58 @@ public class Board {
 		}
 		System.out.println();
 	}
+	
+	
+	
+	public char[][] drawBoard(){
+		char[][] path = this.readFromFile();
+
+		// clear staring positions.
+		for (Cell c: startingCells.values()){
+			Point p = c.getPosition();
+			int row = p.y;
+			int col = p.x;
+
+			path[row][col] = ' '; 
+		}
+
+		// replace '.' with ' '
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				if (path[i][j] == '.') {
+					path[i][j] = ' ';
+				} 
+			}
+		}
+
+		// draw in characters
+		for (Player p: playerPos.keySet()){
+			Cell cell = playerPos.get(p);
+			Point point = cell.getPosition();
+			Character c = p.getCharacter();	
+			if(c == Character.Scarlett){path[point.y][point.x] = '1';}
+			if(c == Character.Mustard){path[point.y][point.x] = '2';}
+			if(c == Character.White){path[point.y][point.x] = '3';}
+			if(c == Character.Green){path[point.y][point.x] = '4';}
+			if(c == Character.Peacock){path[point.y][point.x] = '5';}
+			if(c == Character.Plum){path[point.y][point.x] = '6';}
+		}
+		
+		// draw the map (with corridors as whitespace)
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+					System.out.print(path[i][j]);
+				
+			}
+			System.out.println();
+		}
+		System.out.println();
+
+		return path;
+	}
+		
+		
+	
 
 	// =============================================================================================
 	// Path finding methods (woo!)
@@ -381,6 +433,16 @@ public class Board {
 		// to hold the best path
 		List<Square> bestPath = new ArrayList<Square>();
 		int bestSize = Integer.MAX_VALUE;
+		
+//		// if goal is next to start just add the start and goal, and return (will only be a problem between a room and a corridor)
+//		//------------------------------------------------------------------
+//		int startx = s.getPosition().x;
+//		int starty = s.getPosition().y;
+//		int goalx = g.getPosition().x;
+//		int goaly = g.getPosition().y;
+//		
+//		boolean (Math.abs(startx-goalx)==1 && starty==goaly) || (Math.abs(starty-goaly)==1 && startx==goalx);
+		
 
 		// a. if both start and goal are RoomCells:
 		// -----------------------------------------
@@ -487,12 +549,20 @@ public class Board {
 	 */
 	private List<Square> getBestPathBetween(CorridorCell start,
 			CorridorCell goal) {
+		
+
 
 		// 1. initialise everything
 		// -------------------------
 		PriorityQueue<CellPathObject> fringe = new PriorityQueue<CellPathObject>();
 		List<Square> path = new ArrayList<Square>();
 		Set<CorridorCell> visited = new HashSet<CorridorCell>();
+		
+		// check that start doesn't equal goal
+		if (start == goal){
+			path.add(start);
+			return path;
+		}
 
 		// 2. put start on the fringe
 		// ---------------------------
@@ -562,6 +632,8 @@ public class Board {
 		// 6. check that the goal was reached (reverser will only contain
 		// 'goal') if it wasn't
 		// ---------------------------------------------------------------------------------
+
+		
 		if (reverser.size() == 1) {
 			return null;
 		}
@@ -697,16 +769,16 @@ public class Board {
 
 		// Make all the RoomCell objects
 		// ----------------------
-		RoomCell s = new RoomCell(Room.Spa);
-		RoomCell t = new RoomCell(Room.Theatre);
-		RoomCell l = new RoomCell(Room.LivingRoom);
-		RoomCell o = new RoomCell(Room.Observatory);
-		RoomCell p = new RoomCell(Room.Patio);
-		RoomCell h = new RoomCell(Room.Hall);
-		RoomCell k = new RoomCell(Room.Kitchen);
-		RoomCell d = new RoomCell(Room.DiningRoom);
-		RoomCell g = new RoomCell(Room.GuestRoom);
-		RoomCell w = new RoomCell(Room.SwimmingPool);
+		RoomCell s = new RoomCell(Room.Spa, new Point(3,5));
+		RoomCell t = new RoomCell(Room.Theatre, new Point(10,5));
+		RoomCell l = new RoomCell(Room.LivingRoom, new Point(17,5));
+		RoomCell o = new RoomCell(Room.Observatory, new Point(23,5));
+		RoomCell p = new RoomCell(Room.Patio, new Point(4,16));
+		RoomCell h = new RoomCell(Room.Hall, new Point(10,16));
+		RoomCell k = new RoomCell(Room.Kitchen, new Point(4,24));
+		RoomCell d = new RoomCell(Room.DiningRoom, new Point(10,24));
+		RoomCell g = new RoomCell(Room.GuestRoom, new Point(22,24));
+		RoomCell w = new RoomCell(Room.SwimmingPool, new Point(22,16));
 
 		// add to the map from Room to Cell
 		rooms.put(Room.Spa, s);
@@ -758,14 +830,12 @@ public class Board {
 					map[i][j] = w;
 					break;
 				case '?': // intrigue square
-					map[i][j] = new CorridorCell(true);
-					map[i][j].setPosition(new Point(j, i));
+					map[i][j] = new CorridorCell(new Point(j, i), true);
 					this.intrigueCells.add((CorridorCell) map[i][j]);
 					break;
 				default: // otherwise assume its a corridor, starting point, or
 							// entrance
-					map[i][j] = new CorridorCell(false);
-					map[i][j].setPosition(new Point(j, i));
+					map[i][j] = new CorridorCell(new Point(j, i), false);
 					// if its a starting point, add it to the 'startingCells'
 					// map
 					if (java.lang.Character.isDigit(c)) {
@@ -933,8 +1003,17 @@ public class Board {
 		Board b = new Board(players);
 
 		// testing pathfinding
-		List<Square> path = b.getBestPathTo(p1, Room.Intrigue);
-		b.drawPath(path);
+		List<Square> path = b.getBestPathTo(p1, Room.Spa);
+
+		
+		b.setPlayerPosition(p1, path.get(path.size()-2));
+		System.out.println(p1.getPosition());
+		b.drawBoard();
+		
+		path = b.getBestPathTo(p1, Room.Spa);
+		b.setPlayerPosition(p1, path.get(path.size()-1));
+		System.out.println(p1.getPosition());
+		b.drawBoard();
 
 		Map<Room, Integer> options = b.getDistanceToAllRooms(p1);
 
