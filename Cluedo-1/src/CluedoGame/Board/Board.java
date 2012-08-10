@@ -372,14 +372,11 @@ public class Board {
 		List<Square> bestPath = new ArrayList<Square>();
 		int bestSize = Integer.MAX_VALUE;
 		
-//		// if goal is next to start just add the start and goal, and return (will only be a problem between a room and a corridor)
-//		//------------------------------------------------------------------
-//		int startx = s.getPosition().x;
-//		int starty = s.getPosition().y;
-//		int goalx = g.getPosition().x;
-//		int goaly = g.getPosition().y;
-//		
-//		boolean (Math.abs(startx-goalx)==1 && starty==goaly) || (Math.abs(starty-goaly)==1 && startx==goalx);
+		// check start and goal aren't the same
+		if (s.equals(g)){
+			bestPath.add(s);
+			return bestPath;
+		}
 		
 
 		// a. if both start and goal are RoomCells:
@@ -945,6 +942,12 @@ public class Board {
 		b.setPlayerPosition(p3, path.get(path.size()-1));
 		System.out.println(p3.getPosition());
 		b.drawBoard();
+		
+		Map<Room, Integer> options = b.getDistanceToAllRooms(p3);
+		
+		for (Room r : options.keySet()) {
+		System.out.println(r + ": " + options.get(r));
+		}
 		
 //		path = b.getBestPathTo(p1, Room.Spa);
 //		b.setPlayerPosition(p1, path.get(path.size()-1));
