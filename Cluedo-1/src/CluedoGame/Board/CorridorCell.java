@@ -13,14 +13,13 @@ public class CorridorCell extends Cell {
 	
 	private boolean isBlocked;
 	private boolean isIntrigue;
-	private Point position;
 	
 	// fields for the pathFinding function
 	CorridorCell pathFrom;
 	
 	
-	public CorridorCell(boolean intrigue) {
-		super();
+	public CorridorCell(Point position, boolean intrigue) {
+		super(position);
 		this.isIntrigue = intrigue;
 		this.isBlocked = false;
 	}
@@ -67,14 +66,6 @@ public class CorridorCell extends Cell {
 	}
 	
 	/**
-	 * Returns the position
-	 * @return
-	 */
-	public Point getPosition(){
-		return this.position;
-	}
-	
-	/**
 	 * Returns 'Corridor'.
 	 */
 	@Override
@@ -82,14 +73,6 @@ public class CorridorCell extends Cell {
 		return Room.Corridor;
 	}
 
-	/**
-	 * A corridor cell can only relate to one Point.  If the Cell already has a position, then it will be replaced.
-	 * Nothing will happen if it is given null.
-	 */
-	@Override
-	public void setPosition(Point position) {
-			this.position = position;	
-	}
 
 	@Override
 	public boolean isCorridor() {

@@ -126,6 +126,7 @@ public class CluedoGame {
 		rooms.remove(Room.SwimmingPool);
 		rooms.remove(Room.Corridor);
 
+
 		//first we allocate the players main character
 		Collections.shuffle(charas);
 		for (int i = 0; i < num; i++) {

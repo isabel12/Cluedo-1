@@ -15,9 +15,10 @@ public class RoomCell extends Cell {
 	Room room;
 	RoomCell secretPassage;
 	List<CorridorCell> entrances;
+	Point midPoint;
 
-	public RoomCell(Room room) {
-		super();
+	public RoomCell(Room room, Point position) {
+		super(position);
 		this.room = room;	
 		this.entrances = new ArrayList<CorridorCell>();
 	}
@@ -102,24 +103,7 @@ public class RoomCell extends Cell {
 		return;
 	}
 	
-	/**
-	 * This method is unsupported for RoomCell.
-	 * @throws UnsupportedOperationException.
-	 */
-	@Override
-	public Point getPosition() {
-		throw new UnsupportedOperationException("A room doesn't have a position.");
-	}
 	
-	/**
-	 * This method is unsupported for RoomCell.
-	 * @throws UnsupportedOperationException.
-	 */
-	@Override
-	public void setPosition(Point position) {
-		throw new UnsupportedOperationException("A room doesn't have a position.");
-	}
-
 	/**
 	 * Always returns true.
 	 */
