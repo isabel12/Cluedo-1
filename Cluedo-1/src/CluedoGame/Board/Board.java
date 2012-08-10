@@ -99,7 +99,7 @@ public class Board {
 		
 		if (playerPos.containsKey(player) && this.getBestPathTo(player, newPosition).size() == 0) {
 			throw new IllegalArgumentException(
-					"There is no valid path to the square specified.");
+					"There is no valid path to the square specified: " + newPos);
 		}
 
 		// set current Cell to empty
@@ -935,6 +935,9 @@ public class Board {
 		// testing pathfinding
 		List<Square> path = b.getBestPathTo(p1, Room.Intrigue);
 		b.drawPath(path);
+		
+		b.setPlayerPosition(p1, path.get(path.size()-1));
+		System.out.println(p1.getPosition());
 
 		Map<Room, Integer> options = b.getDistanceToAllRooms(p1);
 
