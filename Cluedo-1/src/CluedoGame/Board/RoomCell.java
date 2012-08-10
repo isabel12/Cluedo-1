@@ -6,7 +6,7 @@ import CluedoGame.*;
 
 
 /**
- * This class represents a Cell that is a room.  It doesn't correspond to a position on the board, and may be connected to another room via a secret passage.
+ * This class represents a Cell that is a room.  It has a position that is it's central square, and may be connected to another room via a secret passage.
  * 
  * @author Izzi
  *
@@ -15,9 +15,11 @@ public class RoomCell extends Cell {
 	Room room;
 	RoomCell secretPassage;
 	List<CorridorCell> entrances;
+	boolean isFinalRoom;
+	
 	Point midPoint;
 
-	public RoomCell(Room room, Point position) {
+	public RoomCell(Room room, Point position, boolean isFinalRoom) {
 		super(position);
 		this.room = room;	
 		this.entrances = new ArrayList<CorridorCell>();
@@ -83,6 +85,7 @@ public class RoomCell extends Cell {
 		}
 	}
 	
+	
 	//===============================================================
 	// Required for Square interface
 	//===============================================================
@@ -102,7 +105,6 @@ public class RoomCell extends Cell {
 	public void setBlocked(boolean isEmpty) {
 		return;
 	}
-	
 	
 	/**
 	 * Always returns true.
@@ -136,6 +138,11 @@ public class RoomCell extends Cell {
 		return false;
 	}
 	
+	@Override
+	public boolean isFinalRoom() {
+		return this.isFinalRoom;
+	}
+	
 	/**
 	 * Always returns false.
 	 */
@@ -151,5 +158,8 @@ public class RoomCell extends Cell {
 	public String toString(){
 		return this.room.toString();
 	}
+
+
+
 
 }

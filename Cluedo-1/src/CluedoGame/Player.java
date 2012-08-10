@@ -27,8 +27,7 @@ public class Player {
 	public Player(Character character, 
 			List<Character> characterCards, List<Weapon> weaponCards, List<Room> roomCards) {
 		
-		this.character = character;
-		
+		this.character = character;	
 		this.characterCards = characterCards;
 		this.weaponCards = weaponCards;
 		this.roomCards = roomCards;
@@ -42,32 +41,26 @@ public class Player {
 	}
 
 
+	//=====================================================
+	// Cards, Character, Position
+	//=====================================================
+	
+	public Room getRoom(){
+		return this.position.getRoom();
+	}
+	
 	public Character getCharacter() {
 		return this.character;
 	}
-
 
 	public void setPosition(Square position) {
 		this.position = position;
 	}
 	
-	
 	public Square getPosition(){
 		return this.position;
 	}
-	
-	public boolean inCornerRoom(){
-		return this.position.isCornerRoom();
-	}
-	
-	public boolean inRoom(){
-		return this.position.isRoom();
-	}
-	
-	public boolean onIntrigueSquare(){
-		return this.position.isIntrigueSquare();
-	}
-	
+
 	public List<Card> getCards() {
 		//return a clone so that they don't have a reference to our data
 		return new ArrayList<Card>(allCards);
@@ -76,6 +69,33 @@ public class Player {
 	public boolean hasCard(Card c) {
 		return allCards.contains(c);
 	}
+	
+
+	//===================================================
+	// Methods to describe the player's position
+	//===================================================
+	public boolean inCornerRoom(){
+		return this.position.isCornerRoom();
+	}
+	
+	public boolean inRoom(){
+		return this.position.isRoom();
+	}
+	
+	public boolean inMurderRoom(){
+		return this.position.isRoom() && !this.position.isFinalRoom();
+	}
+	
+	public boolean inFinalRoom(){
+		return this.position.isFinalRoom();
+	}
+	
+	public boolean onIntrigueSquare(){
+		return this.position.isIntrigueSquare();
+	}
+	
+	
+
 	
 	/**
 	 * Two players are equal if their characters are equal.

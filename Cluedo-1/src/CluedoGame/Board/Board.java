@@ -87,7 +87,7 @@ public class Board {
 	 * @throws - IllegalArgumentException if the player cannot get to the square
 	 *         specified
 	 */
-	public void setPlayerPosition(Player player, Square newPosition) {
+	public void setPlayerPosition(Player player, Square newPosition) throws IllegalArgumentException {
 		Cell newPos = (Cell) newPosition;
 
 		// sanity checks
@@ -140,7 +140,7 @@ public class Board {
 	 * @throws IllegalArgumentException
 	 *             if the player isn't in a room with a secret passage.
 	 */
-	public void useSecretPassage(Player player) {
+	public void useSecretPassage(Player player) throws IllegalArgumentException{
 		Cell position = playerPos.get(player);
 
 		// check they are in a corner room
@@ -158,70 +158,7 @@ public class Board {
 	// Queries about the player state
 	// ========================================================================
 
-	/**
-	 * Returns the room the player is in. 'Corridor' if in a corridor.
-	 * 
-	 * @param player
-	 * @return
-	 */
-	public Room getPlayerRoom(Player player) {
-		return this.playerPos.get(player).getRoom();
-	}
-
-	/**
-	 * Returns true if the player is on an Intrigue square.
-	 * 
-	 * @param player
-	 * @return
-	 */
-	public boolean onIntrigueSquare(Player player) {
-		return this.playerPos.get(player).isIntrigueSquare();
-	}
-
-	/**
-	 * Returns true if the given player is located in a room with a secret
-	 * passageway.
-	 * 
-	 * @param player
-	 * @return
-	 */
-	public boolean inCornerRoom(Player player) {
-		return this.playerPos.get(player).isCornerRoom();
-	}
-
-	/**
-	 * Returns true if the given player is located in a room.
-	 * 
-	 * @param player
-	 * @return - true if the player is in a room
-	 */
-	public boolean inRoom(Player player) {
-		return this.playerPos.get(player).isRoom();
-	}
-
-	/**
-	 * Returns true if the given player is located in one of the possible murder
-	 * rooms (ie. not the final room)
-	 * 
-	 * @param player
-	 * @return - true if the player is in a potential murder room
-	 */
-	public boolean inMurderRoom(Player player) {
-		Cell position = this.playerPos.get(player);
-		return position.isRoom() && !position.getRoom().equals(this.finalRoom);
-	}
-
-	/**
-	 * Returns true if the given player is located in the final room for making
-	 * the final accusation.
-	 * 
-	 * @param player
-	 * @return - true if the player is in the final room
-	 */
-	public boolean inFinalRoom(Player player) {
-		return playerPos.get(player).equals(this.finalRoom);
-	}
-
+	
 	/**
 	 * This method returns a map containing the moves it would take the player
 	 * to reach each room on the board. If there is no path to the room, the
@@ -311,8 +248,9 @@ public class Board {
 	 * Returns the Square at the specified point on the board.
 	 * 
 	 * @return
+	 * @throws IllegalArgumentException if point is not on the board.
 	 */
-	public Square getSquare(Point p) {
+	public Square getSquare(Point p) throws IllegalArgumentException {
 		int col = p.x;
 		int row = p.y;
 		// check Point within bounds
@@ -655,14 +593,12 @@ public class Board {
 	 * 
 	 * Note: This should never be given a RoomCell - only an entrance to one.
 	 * 
-	 * @param start
-	 *            - the starting Cell.
-	 * @param goal
-	 *            - the end Cell.
+	 * @param start - the starting Cell.
+	 * @param goal - the end Cell.
 	 * @throws - IllegalArgumentException if given a RoomCell
-	 * @return
+	 * @return - the estimated path length between the given cells
 	 */
-	private int getEstimate(Cell start, Cell goal) {
+	private int getEstimate(Cell start, Cell goal) throws IllegalArgumentException {
 		if (start instanceof RoomCell || goal instanceof RoomCell) {
 			throw new IllegalArgumentException("Shouldn't be given a RoomCell.");
 		}
@@ -769,16 +705,16 @@ public class Board {
 
 		// Make all the RoomCell objects
 		// ----------------------
-		RoomCell s = new RoomCell(Room.Spa, new Point(3,5));
-		RoomCell t = new RoomCell(Room.Theatre, new Point(10,5));
-		RoomCell l = new RoomCell(Room.LivingRoom, new Point(17,5));
-		RoomCell o = new RoomCell(Room.Observatory, new Point(23,5));
-		RoomCell p = new RoomCell(Room.Patio, new Point(4,14));
-		RoomCell h = new RoomCell(Room.Hall, new Point(22,14));
-		RoomCell k = new RoomCell(Room.Kitchen, new Point(4,24));
-		RoomCell d = new RoomCell(Room.DiningRoom, new Point(10,24));
-		RoomCell g = new RoomCell(Room.GuestRoom, new Point(22,24));
-		RoomCell w = new RoomCell(Room.SwimmingPool, new Point(13,14));
+		RoomCell s = new RoomCell(Room.Spa, new Point(3,5), false);
+		RoomCell t = new RoomCell(Room.Theatre, new Point(10,5), false);
+		RoomCell l = new RoomCell(Room.LivingRoom, new Point(17,5), false);
+		RoomCell o = new RoomCell(Room.Observatory, new Point(23,5),false);
+		RoomCell p = new RoomCell(Room.Patio, new Point(4,14),false);
+		RoomCell h = new RoomCell(Room.Hall, new Point(22,14),false);
+		RoomCell k = new RoomCell(Room.Kitchen, new Point(4,24),false);
+		RoomCell d = new RoomCell(Room.DiningRoom, new Point(10,24),false);
+		RoomCell g = new RoomCell(Room.GuestRoom, new Point(22,24),false);
+		RoomCell w = new RoomCell(Room.SwimmingPool, new Point(13,14),true);
 
 		// add to the map from Room to Cell
 		rooms.put(Room.Spa, s);

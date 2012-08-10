@@ -94,10 +94,11 @@ public class CorridorCell extends Cell {
 		return this.isIntrigue;
 	}
 
+	@Override
+	public boolean isFinalRoom() {
+		return false;
+	}
 
-	
-	
-	
 
 	/**
 	 * I've set this up for debugging purposes.  It can be changed later if necessary.
@@ -111,5 +112,9 @@ public class CorridorCell extends Cell {
 		
 		return string;
 	}
+
+
+
+
 
 }
