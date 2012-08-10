@@ -285,9 +285,9 @@ public class CluedoGame {
 			throw new InvalidMoveException("Cannot make a suggestion once game is finished!");
 		} else if (hasSuggested) {
 			throw new InvalidMoveException("You have already suggested this turn!");
-		} else if (!board.inRoom(currentPlayer)) {	//needs to exclude pool-room!
+		} else if (!currentPlayer.inRoom()) {	//needs to exclude pool-room!
 			throw new InvalidMoveException("Must be in a room to suggest!");
-		} else if (board.inFinalRoom(currentPlayer)) {
+		} else if (currentPlayer.inFinalRoom()) {
 			throw new InvalidMoveException("Cannot suggest from the pool-room!");
 		} else if (refuteMode) {
 			throw new InvalidMoveException("Cannot make suggestion while refuting!");
@@ -296,13 +296,13 @@ public class CluedoGame {
 		}
 
 		//move the suggested player to that room
-		board.summonCharacter(chara, board.getPlayerRoom(currentPlayer));
+		board.summonCharacter(chara, currentPlayer.getRoom());
 
 		//clear the current suggestion, then put in new suggestion
 		suggestion.clear();
 		suggestion.add(chara);
 		suggestion.add(weapon);
-		suggestion.add(board.getPlayerRoom(currentPlayer));
+		suggestion.add(currentPlayer.getRoom());
 
 		//update variables
 		hasSuggested = true;
@@ -332,7 +332,7 @@ public class CluedoGame {
 			throw new InvalidMoveException("Cannot make an accusation once game is finished!");
 		} else if (deadPlayers.contains(currentPlayer)) {
 			throw new InvalidMoveException("A dead player cannot make an accusation!");
-		} else if (!board.inFinalRoom(currentPlayer)) {
+		} else if (!currentPlayer.inFinalRoom()) {
 			throw new InvalidMoveException("Must be in pool-room to accuse!");
 		} else if (refuteMode) {
 			throw new InvalidMoveException("Cannot make accusation while refuting a suggestion!");
@@ -437,7 +437,7 @@ public class CluedoGame {
 			//do move here
 			//board.setPlayerPosition(currentPlayer, path.get(i));
 			board.setPlayerPosition(currentPlayer,  path.get(path.size() - 1));
-			board.
+
 			//subtract 1 from players steps
 			stepsRemaining--;
 		}

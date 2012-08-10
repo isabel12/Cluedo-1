@@ -32,7 +32,7 @@ public abstract class Power {
 	 * @param player
 	 * @throws IllegalStateException if the wielder has been set already.
 	 */
-	public void setWielder(Player player){
+	public void setWielder(Player player) throws IllegalStateException {
 		if (this.wielder != null){
 			throw new IllegalStateException("The wielder is already set.");
 		}
@@ -44,8 +44,9 @@ public abstract class Power {
 	 * @param affected
 	 * @param cardInvolved
 	 * @param squareInvolved
+	 * @throws IllegalStateException if the power has been already used.
 	 */
-	public void activate(Player affected, Card cardInvolved, Square squareInvolved){
+	public void activate(Player affected, Card cardInvolved, Square squareInvolved) throws IllegalStateException {
 		if (this.activated){
 			throw new IllegalStateException("This power has already been used.");
 		}

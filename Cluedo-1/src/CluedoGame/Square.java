@@ -33,7 +33,13 @@ public interface Square {
 	 * Whether the square is an intrigue square or not.
 	 */
 	public boolean isIntrigueSquare();
-		
+	
+	/**
+	 * Whether or not the square is the final room for making the accusation.
+	 * @return
+	 */
+	public boolean isFinalRoom();
+			
 	/**
 	 * The position of the Square on the Board (col, row).  
 	 * @return - NOTE: haven't decided what this should return if its a Room.

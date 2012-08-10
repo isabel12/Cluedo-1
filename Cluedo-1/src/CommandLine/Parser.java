@@ -1,7 +1,5 @@
 package CommandLine;
 
-import java.util.Scanner;
-
 import CluedoGame.Card;
 import CluedoGame.Character;
 import CluedoGame.Room;
