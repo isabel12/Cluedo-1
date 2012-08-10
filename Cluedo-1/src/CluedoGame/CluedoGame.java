@@ -435,7 +435,9 @@ public class CluedoGame {
 		//then move as many steps as the player has left to that location
 		for (int i = 1; i < path.size() && stepsRemaining != 0; i++) {
 			//do move here
-			board.setPlayerPosition(currentPlayer, path.get(i));
+			//board.setPlayerPosition(currentPlayer, path.get(i));
+			board.setPlayerPosition(currentPlayer,  path.get(path.size() - 1));
+			board.
 			//subtract 1 from players steps
 			stepsRemaining--;
 		}

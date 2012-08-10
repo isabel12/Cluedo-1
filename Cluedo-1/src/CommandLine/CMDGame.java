@@ -67,7 +67,7 @@ public class CMDGame {
 				System.out.println("What will " + player + " do? ([help] to print commands) ");
 
 				commandStr = scan.nextLine();
-				command = parser.getCommand(commandStr);
+				command = parser.parseCommand(commandStr);
 
 				switch (command) {
 				case EndTurn:
@@ -307,34 +307,6 @@ public class CMDGame {
 	 * @param player
 	 */
 	private void printActions(Player player) {
-		//all references to player may be done through game instead.
-		//just provisional planning. All that matters is the functionality/ info from this
-		//classes point of view, not where it gets it from.
-
-		//this method may need simplification by performing logic in CluedoGame
-
-		//		if (!player.hasRolled()) {
-		//			System.out.println("Roll dice");
-		//		}
-		//
-		//		if (player.stepsLeft() > 0 && !hasEnteredRoom()) {
-		//			System.out.println("Move towards a location");
-		//		}
-		//
-		//		if (player.inRoom() && !player.hasMadeSuggestion()) {
-		//			if (player.inRoom(PoolRoom) {
-		//				System.out.println("Make final accusation");
-		//			} else {
-		//				System.out.println("Make suggestion");
-		//			}
-		//		}
-		//
-		//		//if in a corner room, you're allowed to move through secret passage
-		//		if (player.inCornerRoom() && !player.hasEnteredRoom()) {
-		//			System.out.println("Move through secret passage");
-		//		}
-
-		//need to get conditions for being able to end a turn prematurely
 		System.out.println("End turn");
 	}
 
@@ -397,8 +369,6 @@ public class CMDGame {
 		System.out.println("help\t-\tdisplays this help message");
 	}
 
-
-
 	/**
 	 * Prompts the users and returns a number between 3 - 6 inclusive.
 	 * Used when instantiating the CluedoGame.
@@ -432,7 +402,7 @@ public class CMDGame {
 		try {
 			Thread.sleep(sleepTimer);
 		} catch (InterruptedException e) {
-			//if it fails, there is no delay between CMD prompts; no biggie
+			//if it fails, there is no delay between CMD prompts; no biggy
 			//just ignore
 		}
 	}
