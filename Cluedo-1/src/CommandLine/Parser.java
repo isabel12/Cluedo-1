@@ -78,7 +78,7 @@ public class Parser {
 		} 
 
 		else if (str.startsWith("print locations")) {
-			return Command.PrintStatus;
+			return Command.PrintLocations;
 		}
 
 		else if (str.startsWith("print status")) {

@@ -10,12 +10,7 @@ public class Player {
 	//their piece on the board
 	private Character character;
 	
-	//cards the player has 
-	private List<Character> characterCards;
-	private List<Weapon> weaponCards;
-	private List<Room> roomCards;
-	
-	//cards as a big list
+	//the players cards 
 	private List<Card> allCards;
 	
 	//location on the board maybe
@@ -25,13 +20,8 @@ public class Player {
 	
 	
 	public Player(Character character, 
-			List<Character> characterCards, List<Weapon> weaponCards, List<Room> roomCards) {
-		
+			List<Character> characterCards, List<Weapon> weaponCards, List<Room> roomCards) {		
 		this.character = character;
-		
-		this.characterCards = characterCards;
-		this.weaponCards = weaponCards;
-		this.roomCards = roomCards;
 		
 		//generate list for the list of all cards
 		allCards = new ArrayList<Card>();
