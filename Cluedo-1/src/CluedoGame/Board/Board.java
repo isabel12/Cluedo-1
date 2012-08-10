@@ -939,11 +939,11 @@ public class Board {
 		Board b = new Board(players);
 
 		// testing pathfinding
-		List<Square> path = b.getBestPathTo(p1, Room.SwimmingPool);
+		List<Square> path = b.getBestPathTo(p3, Room.Spa);
 
 		
-		b.setPlayerPosition(p1, path.get(path.size()-1));
-		System.out.println(p1.getPosition());
+		b.setPlayerPosition(p3, path.get(path.size()-1));
+		System.out.println(p3.getPosition());
 		b.drawBoard();
 		
 //		path = b.getBestPathTo(p1, Room.Spa);
