@@ -11,7 +11,6 @@ import CluedoGame.Player;
 import CluedoGame.Character;
 import CluedoGame.Room;
 import CluedoGame.Weapon;
-import CluedoGame.Board.RoomCell;
 import CommandLine.Parser.Command;
 
 
@@ -68,7 +67,7 @@ public class CMDGame {
 				System.out.println("What will " + player + " do? ([help] to print commands) ");
 
 				commandStr = scan.nextLine();
-				command = parser.getCommand(commandStr);
+				command = parser.parseCommand(commandStr);
 
 				switch (command) {
 				case EndTurn:
@@ -111,6 +110,7 @@ public class CMDGame {
 				default:
 					System.out.println("You entered an invalid command.");
 					System.out.println("Use [help] or [print commands] for information.");
+					sleep(500);
 					break;
 				}
 
@@ -118,13 +118,11 @@ public class CMDGame {
 			}
 		}
 		//game has finished
-		
+
+		sleep(1000);
 		System.out.println("Congratulations " + game.getWinner() + "!");
 		System.out.println("You have won this game of Cluedo!");
 	}
-
-
-
 
 
 	//following methods called on player may either be implemented by Player or by CluedoGame
@@ -155,7 +153,8 @@ public class CMDGame {
 	}
 
 	/**
-	 * Attempts to make a suggestion
+	 * Attempts to make a suggestion.
+	 * Also contains the logic for the refute stage of the suggestion.
 	 * 
 	 * @param suggestion string to be parsed with suggestion params
 	 */
@@ -171,10 +170,11 @@ public class CMDGame {
 
 			if (refuter != null) {
 				System.out.println(refuter + " must refute!");
+				System.out.println("Refute [card]    - refutes suggestion!");
+				System.out.println("print cards    - prints your cards!");
 
 				String commandStr;
 				Scanner scan = new Scanner(System.in);
-				
 				Card refuteCard = null;
 
 				//loops until the refuter gives a card that refutes
@@ -195,7 +195,7 @@ public class CMDGame {
 						}
 					}
 				}
-				
+
 				//player has successfully refuted with refuteCard
 				System.out.println(refuter + " successfully refuted with " + refuteCard);
 				sleep(1000);
@@ -219,11 +219,17 @@ public class CMDGame {
 	private void doMoveTowards(String roomStr) {
 		try {
 			Room room = parser.parseRoom(roomStr);
-			game.moveTowards(room);		
+			boolean completed = game.moveTowards(room);		
+			
 			System.out.println("Moving towards " + room.toString());
-			sleep(1500);
-			//not actually true. Need to get current location.
-			System.out.println("You moved to " + room.toString());
+			sleep(500);
+			if (completed) {
+				System.out.println("You moved all the way to" + player.getPosition().getRoom());
+			} else {
+				System.out.println("You didn't have enough steps to make it all the way.");
+			}
+			
+			sleep(500);
 		} catch (InvalidMoveException e) {
 			System.out.println(e.getMessage());
 		}
@@ -261,7 +267,8 @@ public class CMDGame {
 	private void doMoveSecretPassage() {
 		try {
 			game.moveSecretPassage();
-			System.out.println("You move to...");
+			System.out.println("You move through the secret passage.");
+			sleep(500);
 		} catch (InvalidMoveException e) {
 			System.out.println(e.getMessage());
 		}
@@ -300,34 +307,6 @@ public class CMDGame {
 	 * @param player
 	 */
 	private void printActions(Player player) {
-		//all references to player may be done through game instead.
-		//just provisional planning. All that matters is the functionality/ info from this
-		//classes point of view, not where it gets it from.
-
-		//this method may need simplification by performing logic in CluedoGame
-
-		//		if (!player.hasRolled()) {
-		//			System.out.println("Roll dice");
-		//		}
-		//
-		//		if (player.stepsLeft() > 0 && !hasEnteredRoom()) {
-		//			System.out.println("Move towards a location");
-		//		}
-		//
-		//		if (player.inRoom() && !player.hasMadeSuggestion()) {
-		//			if (player.inRoom(PoolRoom) {
-		//				System.out.println("Make final accusation");
-		//			} else {
-		//				System.out.println("Make suggestion");
-		//			}
-		//		}
-		//
-		//		//if in a corner room, you're allowed to move through secret passage
-		//		if (player.inCornerRoom() && !player.hasEnteredRoom()) {
-		//			System.out.println("Move through secret passage");
-		//		}
-
-		//need to get conditions for being able to end a turn prematurely
 		System.out.println("End turn");
 	}
 
@@ -337,12 +316,18 @@ public class CMDGame {
 	 */
 	private void printLocations(Player player) {	
 		try {
+			Map<Room, Integer> rooms = game.getRoomSteps(player);
+
 			System.out.println(player + "'s Locations:");
-
-			Map<RoomCell, Integer> rooms = game.getRoomSteps(player);
-
-			for (RoomCell c: game.getRoomSteps(player).keySet()) {
-				System.out.println("\t" + c.getRoom() + ", " + rooms.get(c) + " steps away."); 
+			System.out.println(rooms.size());
+			
+			for (Room c: rooms.keySet()) {
+				int steps = rooms.get(c);
+				if (steps == -1) {
+					System.out.println("\t" + c + " is blocked from here.");
+				} else {
+					System.out.println("\t" + c + ", " + steps + " steps away."); 
+				}
 			}
 		} catch (InvalidMoveException e) {
 			System.out.println(e.getMessage());
@@ -375,16 +360,14 @@ public class CMDGame {
 		System.out.println("roll dice\t-\trolls the dice.");
 		System.out.println("move towards [location]\t-\tmoves the player towards [location]");
 		System.out.println("get notepad\t-\tdisplays the notepad to help solve the murder");
-		System.out.println("make suggestion [character] [weapon] [room*]\t-\tmakes a suggestion" +
-				"or accusation. [room] must be specified when accusing from pool room.");
-		System.out.println("select card [card]\t-\tused to refute a murder suggestion");
+		System.out.println("make suggestion [character] [weapon]\t-\tmakes a suggestion");
+		System.out.println("make accusation [character] [weapon] [room]\t-\tmakes an accusation");
+		System.out.println("refute [card]\t-\tused to refute a murder suggestion");
 		System.out.println("secret passage\t-\tmoves the player through the secret passage");
 		System.out.println("end turn\t-\tends the current players turn");
 		System.out.println("print status\t-\tprints the current players status, their room, etc");
 		System.out.println("help\t-\tdisplays this help message");
 	}
-
-
 
 	/**
 	 * Prompts the users and returns a number between 3 - 6 inclusive.
@@ -419,7 +402,7 @@ public class CMDGame {
 		try {
 			Thread.sleep(sleepTimer);
 		} catch (InterruptedException e) {
-			//if it fails, there is no delay between CMD prompts; no biggie
+			//if it fails, there is no delay between CMD prompts; no biggy
 			//just ignore
 		}
 	}

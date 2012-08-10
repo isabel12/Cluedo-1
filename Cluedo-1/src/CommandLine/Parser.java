@@ -1,7 +1,5 @@
 package CommandLine;
 
-import java.util.Scanner;
-
 import CluedoGame.Card;
 import CluedoGame.Character;
 import CluedoGame.Room;
@@ -16,6 +14,10 @@ import CluedoGame.Weapon;
  */
 public class Parser {
 
+	/**
+	 * Enum for different actions a user can take each turn.
+	 * @author Troy Shaw
+	 */
 	public enum Command {
 		RollDice,
 		MoveTowards,
@@ -38,7 +40,7 @@ public class Parser {
 	 * @param str their command string
 	 * @return the enum, or null if nothing matches
 	 */
-	public Command getCommand(String str) {
+	public Command parseCommand(String str) {
 		str = str.toLowerCase();
 
 		if (str.startsWith("roll dice")) {
@@ -60,7 +62,7 @@ public class Parser {
 		else if (str.startsWith("make accusation")) {
 			return Command.MakeAccusation;
 		}
-		
+
 		else if (str.startsWith("select card")) {
 			return Command.SelectCard;
 		} 
@@ -78,7 +80,7 @@ public class Parser {
 		} 
 
 		else if (str.startsWith("print locations")) {
-			return Command.PrintStatus;
+			return Command.PrintLocations;
 		}
 
 		else if (str.startsWith("print status")) {
@@ -127,7 +129,7 @@ public class Parser {
 			//since we are searching for substrings
 			String rStr = r.toString().toLowerCase();
 			if (rStr.contains(" room")) rStr = rStr.split(" ")[0];
-			
+
 			if (matches(str, rStr)) return r;
 		}
 
@@ -148,7 +150,7 @@ public class Parser {
 
 		return null;
 	}
-	
+
 	/**
 	 * Method parses the given string and returns whatever card it contains.
 	 * Works the same as calling each individual parse method, and returning a match.
@@ -159,22 +161,22 @@ public class Parser {
 	 */
 	public Card parseCard(String str) {
 		Card card = parseCharacter(str);
-		
+
 		//must check for null and call parsing method again for each type
-		
+
 		if (card == null) {
 			card = parseWeapon(str);
 		}
-		
+
 		if (card == null) {
 			card = parseRoom(str);
 		}
-		
-		//if nothing matches, card will equal null here
-		
+
+		//if nothing matches, card will be null here
+
 		return card;
 	}
-	
+
 	/**
 	 * Checks if any of the individual words in match is contained in string, disregarding case
 	 * Eg string = scarlett, match = "Kasandra Scarlet" would return true.
@@ -188,21 +190,11 @@ public class Parser {
 	private boolean matches(String string, String match) {
 		string = string.toLowerCase();
 		match = match.toLowerCase();
-		
+
 		for (String s: match.split(" ")) {
 			if (string.contains(s)) return true;
 		}
-		
+
 		return false;
-	}
-	
-	public static void main(String[] args) {
-		Scanner scan = new Scanner(System.in);
-		Parser parser = new Parser();
-		
-		while (true) {
-			Weapon c = parser.parseWeapon(scan.nextLine());
-			System.out.println("lol:" +  c);
-		}
 	}
 }
