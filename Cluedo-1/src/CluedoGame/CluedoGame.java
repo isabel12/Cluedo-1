@@ -54,7 +54,7 @@ public class CluedoGame {
 
 	//once game is over, winner is stored here
 	private Player winner;
-	
+
 
 
 	//the current board
@@ -211,7 +211,7 @@ public class CluedoGame {
 	 */
 	public Map<Room, Integer> getRoomSteps(Player player) throws InvalidMoveException {
 		for (Player p: livePlayers) System.out.println(p.getCharacter());
-		
+
 		if (gameFinished) {
 			throw new InvalidMoveException("Cannot get best paths after game is finished!");
 		} else if (deadPlayers.contains(player)) {	//use dead players since current player is polled from livePlayers
@@ -284,14 +284,16 @@ public class CluedoGame {
 			throw new InvalidMoveException("Cannot make a suggestion once game is finished!");
 		} else if (hasSuggested) {
 			throw new InvalidMoveException("You have already suggested this turn!");
-		} else if (board.inRoom(currentPlayer)) {	//needs to exclude pool-room!
+		} else if (!board.inRoom(currentPlayer)) {	//needs to exclude pool-room!
 			throw new InvalidMoveException("Must be in a room to suggest!");
+		} else if (board.inFinalRoom(currentPlayer)) {
+			throw new InvalidMoveException("Cannot suggest from the pool-room!");
 		} else if (refuteMode) {
 			throw new InvalidMoveException("Cannot make suggestion while refuting!");
 		} else if (chara == null || weapon == null) {
 			throw new InvalidMoveException("Suggestion was invalid! (null)");
 		}
-		
+
 		//move the suggested player to that room
 		board.summonCharacter(chara, board.getPlayerRoom(currentPlayer));
 
@@ -329,8 +331,8 @@ public class CluedoGame {
 			throw new InvalidMoveException("Cannot make an accusation once game is finished!");
 		} else if (deadPlayers.contains(currentPlayer)) {
 			throw new InvalidMoveException("A dead player cannot make an accusation!");
-//		} else if (!board.inFinalRoom(currentPlayer)) {
-//			throw new InvalidMoveException("Must be in pool-room to accuse!");
+		} else if (!board.inFinalRoom(currentPlayer)) {
+			throw new InvalidMoveException("Must be in pool-room to accuse!");
 		} else if (refuteMode) {
 			throw new InvalidMoveException("Cannot make accusation while refuting a suggestion!");
 		} else if (chara == null || weapon == null || room == null) {
@@ -355,7 +357,7 @@ public class CluedoGame {
 				gameFinished = true;
 				winner = livePlayers.poll();
 				currentPlayer = null;
-				
+
 				return false;
 			} else {
 				//game continues
@@ -363,7 +365,7 @@ public class CluedoGame {
 				currentPlayer = livePlayers.poll();
 				//reinitialize variables so they can take turn
 				reinitializeNewTurn();
-				
+
 				return false;
 			}
 		}
@@ -379,7 +381,7 @@ public class CluedoGame {
 		if (!currentPlayer.onIntrigueSquare()) {
 			throw new InvalidMoveException("Player isn't standing on an intrigue square!");
 		} 
-		
+
 		throw new InvalidMoveException("Not currently implemented");
 
 		// it will need to check if the game is over if the timeCards kill a player.
@@ -400,9 +402,9 @@ public class CluedoGame {
 	 * @throws InvalidMoveException if the move fails
 	 */
 	public boolean moveTowards(Room room) throws InvalidMoveException {
-		 if (gameFinished) {
-				throw new InvalidMoveException("Cannot move once game is finished!");
-		 } else if (!hasRolled) {
+		if (gameFinished) {
+			throw new InvalidMoveException("Cannot move once game is finished!");
+		} else if (!hasRolled) {
 			throw new InvalidMoveException("Roll before moving!");
 		} else if (stepsRemaining <= 0) {
 			throw new InvalidMoveException("You have no more steps remaining!");
@@ -430,11 +432,9 @@ public class CluedoGame {
 		if (path.size() - 1 <= stepsRemaining) completedMove = true;
 
 		//then move as many steps as the player has left to that location
-		for (Square s: path) {
-			if (stepsRemaining == 0) break;
-
+		for (int i = 1; i < path.size() && stepsRemaining != 0; i++) {
 			//do move here
-			board.setPlayerPosition(currentPlayer, s);
+			board.setPlayerPosition(currentPlayer, path.get(i));
 			//subtract 1 from players steps
 			stepsRemaining--;
 		}
@@ -444,7 +444,7 @@ public class CluedoGame {
 			//if end of path is a room and they must have entered a room
 			hasEnteredRoom = true;
 		}
-		
+
 		return completedMove;
 	}
 

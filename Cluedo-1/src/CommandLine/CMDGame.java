@@ -226,7 +226,7 @@ public class CMDGame {
 			if (completed) {
 				System.out.println("You moved all the way to" + player.getPosition().getRoom());
 			} else {
-				System.out.println("You didn't have enough steps to make it!");
+				System.out.println("You didn't have enough steps to make it all the way.");
 			}
 			
 			sleep(500);
