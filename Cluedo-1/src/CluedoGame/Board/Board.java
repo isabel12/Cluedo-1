@@ -773,12 +773,12 @@ public class Board {
 		RoomCell t = new RoomCell(Room.Theatre, new Point(10,5));
 		RoomCell l = new RoomCell(Room.LivingRoom, new Point(17,5));
 		RoomCell o = new RoomCell(Room.Observatory, new Point(23,5));
-		RoomCell p = new RoomCell(Room.Patio, new Point(4,16));
-		RoomCell h = new RoomCell(Room.Hall, new Point(10,16));
+		RoomCell p = new RoomCell(Room.Patio, new Point(4,14));
+		RoomCell h = new RoomCell(Room.Hall, new Point(22,14));
 		RoomCell k = new RoomCell(Room.Kitchen, new Point(4,24));
 		RoomCell d = new RoomCell(Room.DiningRoom, new Point(10,24));
 		RoomCell g = new RoomCell(Room.GuestRoom, new Point(22,24));
-		RoomCell w = new RoomCell(Room.SwimmingPool, new Point(22,16));
+		RoomCell w = new RoomCell(Room.SwimmingPool, new Point(13,14));
 
 		// add to the map from Room to Cell
 		rooms.put(Room.Spa, s);
@@ -1003,23 +1003,23 @@ public class Board {
 		Board b = new Board(players);
 
 		// testing pathfinding
-		List<Square> path = b.getBestPathTo(p1, Room.Spa);
+		List<Square> path = b.getBestPathTo(p1, Room.SwimmingPool);
 
 		
-		b.setPlayerPosition(p1, path.get(path.size()-2));
-		System.out.println(p1.getPosition());
-		b.drawBoard();
-		
-		path = b.getBestPathTo(p1, Room.Spa);
 		b.setPlayerPosition(p1, path.get(path.size()-1));
 		System.out.println(p1.getPosition());
 		b.drawBoard();
-
-		Map<Room, Integer> options = b.getDistanceToAllRooms(p1);
-
-		for (Room r : options.keySet()) {
-			System.out.println(r + ": " + options.get(r));
-		}
+		
+//		path = b.getBestPathTo(p1, Room.Spa);
+//		b.setPlayerPosition(p1, path.get(path.size()-1));
+//		System.out.println(p1.getPosition());
+//		b.drawBoard();
+//
+//		Map<Room, Integer> options = b.getDistanceToAllRooms(p1);
+//
+//		for (Room r : options.keySet()) {
+//			System.out.println(r + ": " + options.get(r));
+//		}
 
 	}
 
