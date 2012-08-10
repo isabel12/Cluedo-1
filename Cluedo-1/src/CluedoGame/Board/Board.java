@@ -354,38 +354,54 @@ public class Board {
 		System.out.println();
 	}
 	
-//	public char[][] drawBoard(){
-//		char[][] path = this.readFromFile();
-//
-//		// clear staring positions.
-//		for (Cell c: startingCells.values()){
-//			Point p = c.getPosition();
-//			int row = p.y;
-//			int col = p.x;
-//
-//			path[row][col] = ' '; 
-//		}
-//
-//		// replace '.' with ' '
-//		for (int i = 0; i < rows; i++) {
-//			for (int j = 0; j < cols; j++) {
-//				if (path[i][j] == '.') {
-//					path[i][j] = ' ';
-//				} 
-//			}
-//		}
-//
-//		// draw in characters
-//		for (Player p: playerPos.keySet()){
-//			Cell cell = playerPos.get(p);
-//			Point point = cell.getPosition();
-//			Character c = p.getCharacter();	
-//
-//			switch(c):
-//		case Character.Scarlett:
-//
-//		}
-//	}
+	
+	
+	public char[][] drawBoard(){
+		char[][] path = this.readFromFile();
+
+		// clear staring positions.
+		for (Cell c: startingCells.values()){
+			Point p = c.getPosition();
+			int row = p.y;
+			int col = p.x;
+
+			path[row][col] = ' '; 
+		}
+
+		// replace '.' with ' '
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				if (path[i][j] == '.') {
+					path[i][j] = ' ';
+				} 
+			}
+		}
+
+		// draw in characters
+		for (Player p: playerPos.keySet()){
+			Cell cell = playerPos.get(p);
+			Point point = cell.getPosition();
+			Character c = p.getCharacter();	
+			if(c == Character.Scarlett){path[point.y][point.x] = '1';}
+			if(c == Character.Mustard){path[point.y][point.x] = '2';}
+			if(c == Character.White){path[point.y][point.x] = '3';}
+			if(c == Character.Green){path[point.y][point.x] = '4';}
+			if(c == Character.Peacock){path[point.y][point.x] = '5';}
+			if(c == Character.Plum){path[point.y][point.x] = '6';}
+		}
+		
+		// draw the map (with corridors as whitespace)
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+					System.out.print(path[i][j]);
+				
+			}
+			System.out.println();
+		}
+		System.out.println();
+
+		return path;
+	}
 		
 		
 	
@@ -988,14 +1004,16 @@ public class Board {
 
 		// testing pathfinding
 		List<Square> path = b.getBestPathTo(p1, Room.Spa);
-		b.drawPath(path);
+
 		
 		b.setPlayerPosition(p1, path.get(path.size()-2));
 		System.out.println(p1.getPosition());
+		b.drawBoard();
 		
 		path = b.getBestPathTo(p1, Room.Spa);
 		b.setPlayerPosition(p1, path.get(path.size()-1));
 		System.out.println(p1.getPosition());
+		b.drawBoard();
 
 		Map<Room, Integer> options = b.getDistanceToAllRooms(p1);
 
