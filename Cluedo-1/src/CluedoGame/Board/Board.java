@@ -127,14 +127,14 @@ public class Board {
 	
 	/**
 	 * This method summons the Player with the given character to the given room
-	 * (if they are playing).
+	 * (if they are playing and not already there).
 	 * 
 	 * @param chara
 	 * @param room
 	 */
 	public void summonCharacter(Character chara, Room room) {
 		for (Character p : playerPos.keySet()) {
-			if (p.equals(chara)) {
+			if (p.equals(chara) && !playerPos.get(p).getRoom().equals(room)) {
 				this.setPlayerPosition(p, rooms.get(room));
 			}
 		}

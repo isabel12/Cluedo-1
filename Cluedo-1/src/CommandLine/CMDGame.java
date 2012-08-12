@@ -245,7 +245,7 @@ public class CMDGame {
 			System.out.println("Moving towards " + room.toString());
 			sleep(500);
 			if (completed) {
-				System.out.println("You moved all the way to " + game.getPosition(player).getRoom());
+				System.out.println("You moved all the way to " + room);
 			} else {
 				System.out.println("You didn't have enough steps to make it all the way.");
 			}
@@ -357,6 +357,12 @@ public class CMDGame {
 		for (CluedoGame.Command c: commands) {
 			System.out.println(c);
 		}
+		
+		System.out.println("PrintCards");
+		System.out.println("PrintNotepad");
+		System.out.println("PrintLocations");
+		System.out.println("PrintMap");
+		
 	}
 
 	/**
