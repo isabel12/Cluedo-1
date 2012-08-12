@@ -1,5 +1,6 @@
 package CommandLine;
 
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Map;
@@ -236,7 +237,7 @@ public class CMDGame {
 			System.out.println("Moving towards " + room.toString());
 			sleep(500);
 			if (completed) {
-				System.out.println("You moved all the way to" + player.getPosition().getRoom());
+				System.out.println("You moved all the way to " + player.getPosition().getRoom());
 			} else {
 				System.out.println("You didn't have enough steps to make it all the way.");
 			}
@@ -305,7 +306,24 @@ public class CMDGame {
 	 * @param player
 	 */
 	private void printNotepad(Player player) {
-		System.out.println(player + "'s notepad:");
+		System.out.println(player + "'s notepad:\n");
+		List<Card> possible = new ArrayList<Card>();
+		List<Card> notPossible = new ArrayList<Card>();
+		
+		
+		for (Card c: game.getNotepad(player).keySet()) {
+			if (game.getNotepad(player).get(c)) {
+				notPossible.add(c);
+			} else {
+				possible.add(c);
+			}
+		}
+		
+		System.out.println("Not in murder:");
+		for (Card c: notPossible) System.out.println("\t" + c);
+		
+		System.out.println("\nPossibly in murder:");
+		for (Card c: possible) System.out.println("\t" + c);
 	}
 
 	/**
@@ -347,7 +365,9 @@ public class CMDGame {
 				int steps = rooms.get(c);
 				if (steps == -1) {
 					System.out.println("\t" + c + " is blocked from here.");
-				} else {
+				} else if (steps == 0) {
+					System.out.println("\tYou are in " + c);
+				}else {
 					System.out.println("\t" + c + ", " + steps + " steps away."); 
 				}
 			}

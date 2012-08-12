@@ -1,7 +1,9 @@
 package CluedoGame;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -25,7 +27,7 @@ public class Player {
 	//location on the board maybe
 	private Square position;     
 	
-	//more data
+	private Map<Card, Boolean> notepad;
 	
 	/**
 	 * Contructs a player with the given character and cards.
@@ -49,6 +51,21 @@ public class Player {
 		allCards.addAll(characterCards);
 		allCards.addAll(weaponCards);
 		allCards.addAll(roomCards);
+		
+		//instantiate the notepad and set up the internal state
+		notepad = new HashMap<Card, Boolean>();
+		
+		for (Character c: Character.values()) {
+			notepad.put(c, allCards.contains(c));
+		}
+		
+		for (Weapon w: Weapon.values()) {
+			notepad.put(w, allCards.contains(w));
+		}
+		
+		for (Room r: Room.getMurderRooms()) {
+			notepad.put(r, allCards.contains(r));
+		}
 	}
 
 
@@ -104,6 +121,15 @@ public class Player {
 	 */
 	public boolean hasCard(Card c) {
 		return allCards.contains(c);
+	}
+	
+	/**
+	 * Returns the notepad of Card -> Boolean.
+	 * True means the item represented by the card definitely did not commit a murder
+	 * @return
+	 */
+	public Map<Card, Boolean> getNotepad() {
+		return notepad;
 	}
 	
 

@@ -520,7 +520,10 @@ public class CluedoGame {
 		} else if (!suggestion.contains(card)) {
 			throw new InvalidMoveException("Card was not part of the suggestion!");
 		}
-
+		
+		//update the players notepad so that the card is marked as not a suspect
+		currentPlayer.getNotepad().put(card, true);
+		
 		//should be good at this point
 		refuteMode = false;
 		toRefute = null;
@@ -564,6 +567,10 @@ public class CluedoGame {
 		return null;
 	}
 
+	public Map<Card, Boolean> getNotepad(Player player) {
+		return player.getNotepad();
+	}
+	
 	public enum Command {
 		Roll,
 		MakeAccusation,
