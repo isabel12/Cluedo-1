@@ -33,6 +33,7 @@ public class RoomCell extends Cell {
 		super(position);
 		this.room = room;	
 		this.entrances = new ArrayList<CorridorCell>();
+		this.isFinalRoom = isFinalRoom;
 	}
 	
 	
