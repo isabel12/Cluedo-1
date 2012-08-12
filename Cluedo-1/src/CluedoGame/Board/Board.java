@@ -925,7 +925,7 @@ public class Board {
 		List<Room> room = new ArrayList<Room>();
 		List<Character> chara = new ArrayList<Character>();
 
-		Player p1 = new Player(Character.Scarlett, chara, weapon, room);
+		Player p1 = new Player(Character.Mustard, chara, weapon, room);
 		Player p2 = new Player(Character.Green, chara, weapon, room);
 		Player p3 = new Player(Character.Peacock, chara, weapon, room);
 		players.add(p1);
@@ -936,14 +936,14 @@ public class Board {
 		Board b = new Board(players);
 
 		// testing pathfinding
-		List<Square> path = b.getBestPathTo(p3, Room.Spa);
+		List<Square> path = b.getBestPathTo(p1, Room.Intrigue);
 
 		
-		b.setPlayerPosition(p3, path.get(path.size()-1));
-		System.out.println(p3.getPosition());
+		b.setPlayerPosition(p1, path.get(path.size()-2));
+		System.out.println(p1.getPosition());
 		b.drawBoard();
 		
-		Map<Room, Integer> options = b.getDistanceToAllRooms(p3);
+		Map<Room, Integer> options = b.getDistanceToAllRooms(p1);
 		
 		for (Room r : options.keySet()) {
 		System.out.println(r + ": " + options.get(r));
