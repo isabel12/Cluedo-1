@@ -50,7 +50,7 @@ public class CMDGame {
 
 
 	/**
-	 * Plays a command line based game of cluedo given the current game object.
+	 * Plays a command line based game of cluedo.
 	 * 
 	 * @param game the game we wish to play
 	 */
@@ -111,6 +111,9 @@ public class CMDGame {
 					break;
 				case PrintNotepad:
 					printNotepad(player);
+					break;
+				case PrintMap:
+					printMap();
 					break;
 				case Help:
 					printHelp();
@@ -306,6 +309,13 @@ public class CMDGame {
 	}
 
 	/**
+	 * Prints the map.
+	 */
+	private void printMap() {
+		game.printMap();
+	}
+	
+	/**
 	 * Prints the commands the user can currently do on their turn.
 	 * Includes:
 	 * 	-	roll dice
@@ -332,7 +342,6 @@ public class CMDGame {
 			Map<Room, Integer> rooms = game.getRoomSteps(player);
 
 			System.out.println(player + "'s Locations:");
-			System.out.println(rooms.size());
 			
 			for (Room c: rooms.keySet()) {
 				int steps = rooms.get(c);
@@ -364,10 +373,13 @@ public class CMDGame {
 		System.out.println();
 		System.out.println("roll dice\t-\trolls the dice.");
 		System.out.println("move towards [location]\t-\tmoves the player towards [location]");
-		System.out.println("get notepad\t-\tdisplays the notepad to help solve the murder");
+		System.out.println("print notepad\t-\tdisplays the notepad to help solve the murder");
+		System.out.println("print locations\t-\tdisplays the locations one can move to");
+		System.out.println("print commands\t-\tdisplays the list of commands one can currently do");
+		System.out.println("print cards\t-\tdisplays the cards of the current player");
+		System.out.println("print map\t-\tprints the map");
 		System.out.println("make suggestion [character] [weapon]\t-\tmakes a suggestion");
 		System.out.println("make accusation [character] [weapon] [room]\t-\tmakes an accusation");
-		System.out.println("refute [card]\t-\tused to refute a murder suggestion");
 		System.out.println("secret passage\t-\tmoves the player through the secret passage");
 		System.out.println("end turn\t-\tends the current players turn");
 		System.out.println("help\t-\tdisplays this help message");

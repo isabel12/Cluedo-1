@@ -29,6 +29,7 @@ public class Parser {
 		PrintCommands,
 		PrintCards,
 		PrintLocations,
+		PrintMap,
 		Help,
 		Undefined
 	}
@@ -75,6 +76,10 @@ public class Parser {
 
 		else if (str.startsWith("print locations")) {
 			return Command.PrintLocations;
+		}
+		
+		else if (str.startsWith("print map")) {
+			return Command.PrintMap;
 		}
 
 		else if (str.startsWith("print commands")) {

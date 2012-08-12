@@ -454,6 +454,13 @@ public class CluedoGame {
 	}
 
 	/**
+	 * Draws a representation of the board to System.out.
+	 */
+	public void printMap() {
+		if (board != null) board.drawBoard();
+	}
+	
+	/**
 	 * Moves the player through the secret entrance of the room they are in, if it exists, and they are able to.
 	 * 
 	 * @throws InvalidMoveException if player isn't in corner room or has already moved this turn
