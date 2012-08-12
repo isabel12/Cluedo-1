@@ -84,23 +84,27 @@ public class Board {
 	 * @param player
 	 * @param newPos
 	 * @throws - IllegalArgumentException if the player cannot get to the square
-	 *         specified
+	 *         specified, or if it is already in the square specified.
 	 */
 	public void setPlayerPosition(Player player, Square newPosition) throws IllegalArgumentException {
 		Cell newPos = (Cell) newPosition;
 
-		// sanity checks
+		// sanity checks	
+		if (newPos.equals(player.getPosition())) {
+			throw new IllegalArgumentException(
+					"You are already in that location.");
+		}
 		if (newPos instanceof CorridorCell
 				&& ((CorridorCell) newPos).isBlocked()) {
 			throw new IllegalArgumentException(
 					"The square specified is not empty.");
 		}
-		
 		if (playerPos.containsKey(player) && this.getBestPathTo(player, newPosition).size() == 0) {
 			throw new IllegalArgumentException(
 					"There is no valid path to the square specified: " + newPos);
 		}
 
+		
 		// set current Cell to empty
 		Cell currPos = playerPos.get(player);
 		if (currPos != null) {
