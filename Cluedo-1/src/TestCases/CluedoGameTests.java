@@ -91,4 +91,20 @@ public class CluedoGameTests {
 
 	}
 
+	/**
+	 * 
+	 */
+	@Test
+	public void notepadTests() {
+		CluedoGame game = null;
+		
+		try {
+			game = new CluedoGame(3);
+		} catch (Exception e) {
+			System.exit(-1);
+		}
+		
+		
+	}
+	
 }
