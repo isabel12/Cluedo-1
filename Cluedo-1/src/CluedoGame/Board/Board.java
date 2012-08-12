@@ -84,23 +84,27 @@ public class Board {
 	 * @param player
 	 * @param newPos
 	 * @throws - IllegalArgumentException if the player cannot get to the square
-	 *         specified
+	 *         specified, or if it is already in the square specified.
 	 */
 	public void setPlayerPosition(Player player, Square newPosition) throws IllegalArgumentException {
 		Cell newPos = (Cell) newPosition;
 
-		// sanity checks
+		// sanity checks	
+		if (newPos.equals(player.getPosition())) {
+			throw new IllegalArgumentException(
+					"You are already in that location: " + player.getPosition());
+		}
 		if (newPos instanceof CorridorCell
 				&& ((CorridorCell) newPos).isBlocked()) {
 			throw new IllegalArgumentException(
 					"The square specified is not empty.");
 		}
-		
 		if (playerPos.containsKey(player) && this.getBestPathTo(player, newPosition).size() == 0) {
 			throw new IllegalArgumentException(
 					"There is no valid path to the square specified: " + newPos);
 		}
 
+		
 		// set current Cell to empty
 		Cell currPos = playerPos.get(player);
 		if (currPos != null) {
@@ -944,18 +948,25 @@ public class Board {
 		Board b = new Board(players);
 
 		// testing pathfinding
-		List<Square> path = b.getBestPathTo(p3, Room.Spa);
+		List<Square> path = b.getBestPathTo(p3, Room.Intrigue);
 
+		try{
+			for (int i = 1; i < path.size(); i++ ){
+				b.setPlayerPosition(p3, path.get(i));
+			}
+		} catch (IllegalArgumentException e){System.out.println(e.getMessage());}
+			
+			
+			
 		
-		b.setPlayerPosition(p3, path.get(path.size()-1));
-		System.out.println(p3.getPosition());
-		b.drawBoard();
-		
-		Map<Room, Integer> options = b.getDistanceToAllRooms(p3);
-		
-		for (Room r : options.keySet()) {
-		System.out.println(r + ": " + options.get(r));
-		}
+//		System.out.println(p3.getPosition());
+//		b.drawBoard();
+//		
+//		Map<Room, Integer> options = b.getDistanceToAllRooms(p3);
+//		
+//		for (Room r : options.keySet()) {	
+//			System.out.println(r + ": " + options.get(r));
+//		}
 		
 //		path = b.getBestPathTo(p1, Room.Spa);
 //		b.setPlayerPosition(p1, path.get(path.size()-1));
