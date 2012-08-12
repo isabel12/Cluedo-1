@@ -25,14 +25,13 @@ import CluedoGame.Weapon;
  * moving their locations when requested via a valid route, and setting Players'
  * locations for them when they are moved.
  * 
- * We decided the Board would be responsible for setting the Player's location.
+ * The Board is be responsible for setting the Player's location.
  * Eg. The Board is passed a player, it gets the players character, moves that
  * character on the board, and then changes the Player's location to match its
- * token on the board.
+ * location on the board.
  * 
- * NOTE: I've implemented it so that Point (x,y) is (col, row). The map is still
- * [row][col] (this is the only way you can really do it without running into
- * massive problems!!)
+ * NOTE: Point (x,y) corresponds to (col, row) on the map, with (0,0) being the 
+ * top left corner. 
  * 
  * 
  * @author Izzi
@@ -57,7 +56,7 @@ public class Board {
 	private Map<Player, Cell> playerPos;
 
 	/**
-	 * Constructor for Board. Takes a set of players as an argument.
+	 * Constructor for Board. Takes a set of players as an argument(to ensure there are no duplicates)
 	 * 
 	 * @param currPlayers
 	 */
@@ -76,7 +75,7 @@ public class Board {
 	}
 
 	// =============================================================================================
-	// Player control methods
+	// Player movement methods
 	// =============================================================================================
 
 	/**
@@ -118,6 +117,7 @@ public class Board {
 		player.setPosition(newPos);
 	}
 
+	
 	/**
 	 * This method summons the Player with the given character to the given room
 	 * (if they are playing).
@@ -132,6 +132,7 @@ public class Board {
 			}
 		}
 	}
+
 
 	/**
 	 * This method moves the given player through the secret passage in the room
@@ -155,7 +156,7 @@ public class Board {
 	}
 
 	// ========================================================================
-	// Queries about the player state
+	// Queries about the Player's location on the board
 	// ========================================================================
 
 	
@@ -229,20 +230,23 @@ public class Board {
 	 * @return
 	 */
 	public List<Square> getBestPathTo(Player player, Room room) {
-		// get the start and goal cells
+		// get the start cell
 		Cell s = (Cell) player.getPosition();
 		Cell g = null;
-
-		// if room is intrigue, goal is the closest one.
+		List<Square> path = new ArrayList<Square>();
+		
+		// get goal cell
 		if (room == Room.Intrigue) {
-			g = this.getClosestIntrigue(player);
+			g = this.getClosestIntrigue(player);// if room is intrigue, goal is the closest one.
 		} else { // otherwise get the room
 			g = rooms.get(room);
 		}
 
-		return this.getBestPathBetween(s, g);
+		if (g == null){ return path;}	
+		else {return this.getBestPathBetween(s, g);}
 	}
 
+	
 	// Not sure if this should be public or private yet.
 	/**
 	 * Returns the Square at the specified point on the board.
@@ -262,6 +266,7 @@ public class Board {
 
 	}
 
+	
 	/**
 	 * Draw's a textual representation of the map, with the path given drawn in
 	 * asterisks (also draws it for you)
@@ -293,7 +298,10 @@ public class Board {
 	}
 	
 	
-	
+	/**
+	 * Draws a text based representation of the board, with player locations
+	 * @return
+	 */
 	public char[][] drawBoard(){
 		char[][] path = this.readFromFile();
 
@@ -303,17 +311,17 @@ public class Board {
 			int row = p.y;
 			int col = p.x;
 
-			path[row][col] = ' '; 
+			path[row][col] = '.'; 
 		}
 
-		// replace '.' with ' '
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				if (path[i][j] == '.') {
-					path[i][j] = ' ';
-				} 
-			}
-		}
+//		// replace '.' with ' '
+//		for (int i = 0; i < rows; i++) {
+//			for (int j = 0; j < cols; j++) {
+//				if (path[i][j] == '.') {
+//					path[i][j] = ' ';
+//				} 
+//			}
+//		}
 
 		// draw in characters
 		for (Player p: playerPos.keySet()){
@@ -350,10 +358,10 @@ public class Board {
 
 	/**
 	 * 
-	 * This method returns the optimum path in the form of a List<Cell>, where
+	 * This method returns the optimum path in the form of a List<Square>, where
 	 * the first entry is the start, and the last the goal.
 	 * 
-	 * This method is a wrapper method for the A* search algorithm, whose
+	 * This method is an overloaded wrapper method for the A* search algorithm, whose
 	 * heuristic getEstimate() algorithm can't handle rooms being in lots of
 	 * places at once. It takes the start cell and the goal cell, checks whether
 	 * either of them are rooms, and if so, it gets all optimum paths between
@@ -372,7 +380,7 @@ public class Board {
 		List<Square> bestPath = new ArrayList<Square>();
 		int bestSize = Integer.MAX_VALUE;
 		
-		// check start and goal aren't the same
+		// check start and goal aren't the same - if so, add start and return
 		if (s.equals(g)){
 			bestPath.add(s);
 			return bestPath;
@@ -493,7 +501,7 @@ public class Board {
 		List<Square> path = new ArrayList<Square>();
 		Set<CorridorCell> visited = new HashSet<CorridorCell>();
 		
-		// check that start doesn't equal goal
+		// check that start doesn't equal goal - if so, add start and return
 		if (start == goal){
 			path.add(start);
 			return path;
@@ -584,7 +592,7 @@ public class Board {
 	}
 
 	/**
-	 * Returns the optimal path (ignoring walls etc) between two Cells.
+	 * Helper method for getBestPathTo.  Returns the optimal path (ignoring walls etc) between two Cells.
 	 * Calculated by horizontal difference + vertical difference (so it doesn't
 	 * try go diagonally).
 	 * 
