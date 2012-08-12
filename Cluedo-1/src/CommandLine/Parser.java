@@ -27,7 +27,7 @@ public class Parser {
 		SelectCard,
 		SecretPassage,
 		EndTurn,
-		PrintActions,
+		PrintCommands,
 		PrintCards,
 		PrintLocations,
 		PrintStatus,
@@ -87,8 +87,8 @@ public class Parser {
 			return Command.PrintStatus;
 		}
 
-		else if (str.startsWith("print actions")) {
-			return Command.PrintActions;
+		else if (str.startsWith("print commands")) {
+			return Command.PrintCommands;
 		}
 
 		else if (str.startsWith("help")) {

@@ -2,6 +2,7 @@ package CluedoGame;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -554,31 +555,38 @@ public class CluedoGame {
 		return null;
 	}
 
+	public enum Command {
+		Roll,
+		MakeAccusation,
+		MakeSuggestion,
+		Move,
+		EnterSecretPassage,
+		DrawIntrigue,
+		Refute,
+		EndTurn,
+	}
+
 	/**
-	 * The idea for this method is to communicate what main stage the game is at, so the UI class can communicate with the player.
-	 * The main useful states are:
-	 * 
-	 * 1 - inCorridor, notRolled
-	 * 2 - rolled, moves remaining 
-	 * 3 - inRoom, notRolled
-	 * 4 - inCornerRoom, notRolled
-	 * 5 - turnFinished
-	 * 6 - rolled, Location is intrigue
-	 * 7 - someone has to refute
-	 * 
+	 * Returns the moves the current player can take.
 	 * @return
 	 */
-	public int getGameStatus(){
-		//		if (!inRoom && !hasRolled){return 1;}
-		if (hasRolled && stepsRemaining > 0){return 2;}
-		//		if (inRoom && !hasRolled){return 3;}
-		if (currentPlayer.inCornerRoom() && !hasRolled){return 4;}  // <--- should we let people move if they have rolled, but haven't moved?
-		if (turnFinished){return 5;}
-		//if (hasRolled && !turnFinished && )  
-		if (toRefute != null){return 7;}
-		if (hasRolled && !turnFinished && currentPlayer.onIntrigueSquare()){return 6;}
+	public List<Command> getCommands(){
+		List<Command> toReturn = new ArrayList<Command>();
 
-		else return -1;
+		if (gameFinished) return toReturn;
+		if (refuteMode) {
+			toReturn.add(Command.Refute);
+			return toReturn;
+		}
+		if (!hasRolled) toReturn.add(Command.Roll);
+		if (!hasSuggested && currentPlayer.inMurderRoom()) toReturn.add(Command.MakeSuggestion);
+		if (!hasSuggested && currentPlayer.inFinalRoom()) toReturn.add(Command.MakeAccusation);
+		if (!hasEnteredRoom && currentPlayer.inCornerRoom()) toReturn.add(Command.EnterSecretPassage);
+		if (currentPlayer.onIntrigueSquare()) toReturn.add(Command.DrawIntrigue);
+		if (stepsRemaining > 0) toReturn.add(Command.Move);
+		toReturn.add(Command.EndTurn);
+
+		return toReturn;
 	}
 
 	/**

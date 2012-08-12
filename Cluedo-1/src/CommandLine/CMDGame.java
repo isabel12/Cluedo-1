@@ -1,6 +1,7 @@
 package CommandLine;
 
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -88,11 +89,8 @@ public class CMDGame {
 				case SecretPassage:
 					doMoveSecretPassage();
 					break;
-				case PrintStatus:
-					printStatus(player);
-					break;
-				case PrintActions:
-					printActions(player);
+				case PrintCommands:
+					printCommands(player);
 					break;
 				case PrintCards:
 					printCards(player);
@@ -297,7 +295,7 @@ public class CMDGame {
 	}
 
 	/**
-	 * Prints the actions the user can currently do on their turn
+	 * Prints the commands the user can currently do on their turn.
 	 * Includes:
 	 * 	-	roll dice
 	 * 	-	move towards location
@@ -306,8 +304,12 @@ public class CMDGame {
 	 * 	-	end turn
 	 * @param player
 	 */
-	private void printActions(Player player) {
-		System.out.println("End turn");
+	private void printCommands(Player player) {
+		List<CluedoGame.Command> commands = game.getCommands();
+		
+		for (CluedoGame.Command c: commands) {
+			System.out.println(c);
+		}
 	}
 
 	/**
@@ -332,14 +334,6 @@ public class CMDGame {
 		} catch (InvalidMoveException e) {
 			System.out.println(e.getMessage());
 		}
-	}
-
-	/**
-	 * Prints the players status, such as what room they're in, # steps left, etc.
-	 * @param player player we are printing from
-	 */
-	private void printStatus(Player player) {
-		//will write this method once we have a better idea of params to print.
 	}
 
 	/**
