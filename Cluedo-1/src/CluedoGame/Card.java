@@ -7,7 +7,21 @@ package CluedoGame;
  *
  */
 public interface Card {
+	/**
+	 * Returns true if this card is a weapon.
+	 * @return
+	 */
 	public boolean isWeapon();
+	
+	/**
+	 * Returns true if this card is a character.
+	 * @return
+	 */
 	public boolean isCharacter();
+	
+	/**
+	 * Returns true if this card is a room.
+	 * @return
+	 */
 	public boolean isRoom();
 }

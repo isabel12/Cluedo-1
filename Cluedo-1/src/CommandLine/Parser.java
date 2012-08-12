@@ -21,16 +21,15 @@ public class Parser {
 	public enum Command {
 		RollDice,
 		MoveTowards,
-		PrintNotepad,
 		MakeAccusation,
 		MakeSuggestion,
-		SelectCard,
 		SecretPassage,
 		EndTurn,
-		PrintActions,
+		PrintCommands,
 		PrintCards,
+		PrintNotepad,
 		PrintLocations,
-		PrintStatus,
+		PrintMap,
 		Help,
 		Undefined
 	}
@@ -63,10 +62,6 @@ public class Parser {
 			return Command.MakeAccusation;
 		}
 
-		else if (str.startsWith("select card")) {
-			return Command.SelectCard;
-		} 
-
 		else if (str.startsWith("secret passage")) {
 			return Command.SecretPassage;
 		}
@@ -82,13 +77,13 @@ public class Parser {
 		else if (str.startsWith("print locations")) {
 			return Command.PrintLocations;
 		}
-
-		else if (str.startsWith("print status")) {
-			return Command.PrintStatus;
+		
+		else if (str.startsWith("print map")) {
+			return Command.PrintMap;
 		}
 
-		else if (str.startsWith("print actions")) {
-			return Command.PrintActions;
+		else if (str.startsWith("print commands")) {
+			return Command.PrintCommands;
 		}
 
 		else if (str.startsWith("help")) {

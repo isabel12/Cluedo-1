@@ -8,41 +8,45 @@ package CluedoGame;
  *
  */
 
-	public enum Weapon implements Card {
-		Axe("Axe"),
-		BaseballBat("Baseball bat"),
-		Candlestick("Candle stick"),
-		Dumbbell("Dumbbell"),
-		Knife("Knife"),
-		Pistol("Pistol"),
-		Poison("Poison"),
-		Rope("Rope"),
-		Trophy("Trophy");
-		
-		
-		private final String weapon;
+public enum Weapon implements Card {
+	Axe("Axe"),
+	BaseballBat("Baseball bat"),
+	Candlestick("Candle stick"),
+	Dumbbell("Dumbbell"),
+	Knife("Knife"),
+	Pistol("Pistol"),
+	Poison("Poison"),
+	Rope("Rope"),
+	Trophy("Trophy");
 
-		Weapon(String weapon){
-			this.weapon = weapon;
-		}
-		
-		@Override
-		public String toString(){
-			return weapon;
-		}
-		
-		@Override
-		public boolean isWeapon(){
-			return true;
-		}
 
-		@Override
-		public boolean isCharacter() {
-			return false;
-		}
-
-		@Override
-		public boolean isRoom() {
-			return false;
-		}
+	private final String weapon;
+	
+	/**
+	 * Constructs a Weapon with the given weapon name.
+	 * @param weapon
+	 */
+	Weapon(String weapon){
+		this.weapon = weapon;
 	}
+
+	@Override
+	public String toString(){
+		return weapon;
+	}
+
+	@Override
+	public boolean isWeapon(){
+		return true;
+	}
+
+	@Override
+	public boolean isCharacter() {
+		return false;
+	}
+
+	@Override
+	public boolean isRoom() {
+		return false;
+	}
+}

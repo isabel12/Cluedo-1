@@ -1,5 +1,10 @@
 package CluedoGame;
 
+/**
+ * Enum represents a Character in the Cluedo game.
+ * @author Troy Shaw
+ *
+ */
 public enum Character implements Card {
 	Scarlett("Kasandra Scarlett"),
 	Mustard("Jack Mustard"),
@@ -10,14 +15,26 @@ public enum Character implements Card {
 
 	private final String name;
 
-	
-	Character(String name){
+	/**
+	 * Creates a character with the given name.
+	 * @param name
+	 */
+	private Character(String name){
 		this.name = name;
 	}
 
+	/**
+	 * Gets the last name of this character.
+	 * @return
+	 */
 	public String getShortName() {
 		return getName().split(" ")[1];
 	}
+	
+	/**
+	 * Returns the name of this character.
+	 * @return
+	 */
 	public String getName(){
 		return name;
 	}

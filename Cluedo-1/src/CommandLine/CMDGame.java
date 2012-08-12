@@ -1,11 +1,14 @@
 package CommandLine;
 
+import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 import CluedoGame.Card;
 import CluedoGame.CluedoGame;
+import CluedoGame.CluedoPlayer;
 import CluedoGame.InvalidMoveException;
 import CluedoGame.Player;
 import CluedoGame.Character;
@@ -13,11 +16,17 @@ import CluedoGame.Room;
 import CluedoGame.Weapon;
 import CommandLine.Parser.Command;
 
-
+/**
+ * Represents a game of Cluedo played through the command line.
+ * Create a new CMDGame and a game will immediately begin.
+ * 
+ * @author Troy Shaw
+ *
+ */
 public class CMDGame {
 
 	//player currently taking turn
-	private Player player;
+	private CluedoPlayer player;
 
 	//the current game object
 	private CluedoGame game;
@@ -28,7 +37,13 @@ public class CMDGame {
 	public CMDGame() {
 		//construct the game object
 		System.out.println("Welcome to Cluedo!\n");
-		game = new CluedoGame(getNumberPlayers());
+		try {
+			game = new CluedoGame(getNumberPlayers());
+		} catch (Exception e) {
+			System.out.println("Error making game");
+			e.printStackTrace();
+			System.exit(-1);
+		}
 
 		//play a real game now
 		System.out.println("Starting a new game of Cluedo!");
@@ -38,7 +53,7 @@ public class CMDGame {
 
 
 	/**
-	 * Plays a command line based game of cluedo given the current game object.
+	 * Plays a command line based game of cluedo.
 	 * 
 	 * @param game the game we wish to play
 	 */
@@ -88,11 +103,8 @@ public class CMDGame {
 				case SecretPassage:
 					doMoveSecretPassage();
 					break;
-				case PrintStatus:
-					printStatus(player);
-					break;
-				case PrintActions:
-					printActions(player);
+				case PrintCommands:
+					printCommands(player);
 					break;
 				case PrintCards:
 					printCards(player);
@@ -102,6 +114,9 @@ public class CMDGame {
 					break;
 				case PrintNotepad:
 					printNotepad(player);
+					break;
+				case PrintMap:
+					printMap();
 					break;
 				case Help:
 					printHelp();
@@ -166,7 +181,7 @@ public class CMDGame {
 			game.makeSuggestion(chara, weapon);
 
 			//get refuting player
-			Player refuter = game.getRefuter();
+			CluedoPlayer refuter = game.getRefuter();
 
 			if (refuter != null) {
 				System.out.println(refuter + " must refute!");
@@ -224,7 +239,7 @@ public class CMDGame {
 			System.out.println("Moving towards " + room.toString());
 			sleep(500);
 			if (completed) {
-				System.out.println("You moved all the way to" + player.getPosition().getRoom());
+				System.out.println("You moved all the way to " + player.getPosition().getRoom());
 			} else {
 				System.out.println("You didn't have enough steps to make it all the way.");
 			}
@@ -292,12 +307,36 @@ public class CMDGame {
 	 * Prints the given players notepad.
 	 * @param player
 	 */
-	private void printNotepad(Player player) {
-		System.out.println(player + "'s notepad:");
+	private void printNotepad(CluedoPlayer player) {
+		System.out.println(player + "'s notepad:\n");
+		List<Card> possible = new ArrayList<Card>();
+		List<Card> notPossible = new ArrayList<Card>();
+		
+		
+		for (Card c: game.getNotepad(player).keySet()) {
+			if (game.getNotepad(player).get(c)) {
+				notPossible.add(c);
+			} else {
+				possible.add(c);
+			}
+		}
+		
+		System.out.println("Not in murder:");
+		for (Card c: notPossible) System.out.println("\t" + c);
+		
+		System.out.println("\nPossibly in murder:");
+		for (Card c: possible) System.out.println("\t" + c);
 	}
 
 	/**
-	 * Prints the actions the user can currently do on their turn
+	 * Prints the map.
+	 */
+	private void printMap() {
+		game.printMap();
+	}
+	
+	/**
+	 * Prints the commands the user can currently do on their turn.
 	 * Includes:
 	 * 	-	roll dice
 	 * 	-	move towards location
@@ -306,26 +345,31 @@ public class CMDGame {
 	 * 	-	end turn
 	 * @param player
 	 */
-	private void printActions(Player player) {
-		System.out.println("End turn");
+	private void printCommands(CluedoPlayer player) {
+		List<CluedoGame.Command> commands = game.getCommands();
+		
+		for (CluedoGame.Command c: commands) {
+			System.out.println(c);
+		}
 	}
 
 	/**
 	 * Prints the locations and number of optimal steps relative to given player.
 	 * @param player
 	 */
-	private void printLocations(Player player) {	
+	private void printLocations(CluedoPlayer player) {	
 		try {
 			Map<Room, Integer> rooms = game.getRoomSteps(player);
 
 			System.out.println(player + "'s Locations:");
-			System.out.println(rooms.size());
 			
 			for (Room c: rooms.keySet()) {
 				int steps = rooms.get(c);
 				if (steps == -1) {
 					System.out.println("\t" + c + " is blocked from here.");
-				} else {
+				} else if (steps == 0) {
+					System.out.println("\tYou are in " + c);
+				}else {
 					System.out.println("\t" + c + ", " + steps + " steps away."); 
 				}
 			}
@@ -335,18 +379,10 @@ public class CMDGame {
 	}
 
 	/**
-	 * Prints the players status, such as what room they're in, # steps left, etc.
-	 * @param player player we are printing from
-	 */
-	private void printStatus(Player player) {
-		//will write this method once we have a better idea of params to print.
-	}
-
-	/**
 	 * Prints the given players cards.
 	 * @param player the player we are printing from
 	 */
-	private void printCards(Player player) {
+	private void printCards(CluedoPlayer player) {
 		System.out.println(player + " has:");
 		for (Card c: player.getCards())	System.out.println("\t" + c);
 	}
@@ -359,13 +395,15 @@ public class CMDGame {
 		System.out.println();
 		System.out.println("roll dice\t-\trolls the dice.");
 		System.out.println("move towards [location]\t-\tmoves the player towards [location]");
-		System.out.println("get notepad\t-\tdisplays the notepad to help solve the murder");
+		System.out.println("print notepad\t-\tdisplays the notepad to help solve the murder");
+		System.out.println("print locations\t-\tdisplays the locations one can move to");
+		System.out.println("print commands\t-\tdisplays the list of commands one can currently do");
+		System.out.println("print cards\t-\tdisplays the cards of the current player");
+		System.out.println("print map\t-\tprints the map");
 		System.out.println("make suggestion [character] [weapon]\t-\tmakes a suggestion");
 		System.out.println("make accusation [character] [weapon] [room]\t-\tmakes an accusation");
-		System.out.println("refute [card]\t-\tused to refute a murder suggestion");
 		System.out.println("secret passage\t-\tmoves the player through the secret passage");
 		System.out.println("end turn\t-\tends the current players turn");
-		System.out.println("print status\t-\tprints the current players status, their room, etc");
 		System.out.println("help\t-\tdisplays this help message");
 	}
 
