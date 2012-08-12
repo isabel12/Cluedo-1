@@ -50,11 +50,11 @@ public class BoardTests {
 		players.add(p3);
 		
 		getNewBoard();
-		
-
 	}
 
-	
+	/**
+	 * Testing that the board doesn't let players be moved to illegal Squares.
+	 */
 	@Test
 	public void movementTests() {
 		getNewBoard();
@@ -98,7 +98,9 @@ public class BoardTests {
 	}
 	
 	
-	
+	/**
+	 * Tests that path finding between squares works.
+	 */
 	@Test
 	public void testPathFinding(){
 		getNewBoard();
@@ -162,12 +164,23 @@ public class BoardTests {
 		}
 		
 		
+	}
+	
+	/**
+	 * Tests that finding the closest Intrigue square to the player works
+	 */
+	@Test
+	public void testClosestIntrigue(){
+		getNewBoard();
+		
+		List<Square> path = board.getBestPathTo(p3, Room.Intrigue);
+		if (path.size() != 6){
+			board.drawPath(path);
+			fail("path size should be 6: " + path.size());
+		}
 		
 		
 	}
-	
-	
-	
 	
 	
 	
@@ -223,6 +236,7 @@ public class BoardTests {
 			
 	}
 
+	
 	
 	/**
 	 * Gets a newly set up version of the board.

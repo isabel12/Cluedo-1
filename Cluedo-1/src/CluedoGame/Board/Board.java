@@ -92,7 +92,7 @@ public class Board {
 		// sanity checks	
 		if (newPos.equals(player.getPosition())) {
 			throw new IllegalArgumentException(
-					"You are already in that location.");
+					"You are already in that location: " + player.getPosition());
 		}
 		if (newPos instanceof CorridorCell
 				&& ((CorridorCell) newPos).isBlocked()) {
@@ -948,18 +948,25 @@ public class Board {
 		Board b = new Board(players);
 
 		// testing pathfinding
-		List<Square> path = b.getBestPathTo(p3, Room.Spa);
+		List<Square> path = b.getBestPathTo(p3, Room.Intrigue);
 
+		try{
+			for (int i = 1; i < path.size(); i++ ){
+				b.setPlayerPosition(p3, path.get(i));
+			}
+		} catch (IllegalArgumentException e){System.out.println(e.getMessage());}
+			
+			
+			
 		
-		b.setPlayerPosition(p3, path.get(path.size()-1));
-		System.out.println(p3.getPosition());
-		b.drawBoard();
-		
-		Map<Room, Integer> options = b.getDistanceToAllRooms(p3);
-		
-		for (Room r : options.keySet()) {
-		System.out.println(r + ": " + options.get(r));
-		}
+//		System.out.println(p3.getPosition());
+//		b.drawBoard();
+//		
+//		Map<Room, Integer> options = b.getDistanceToAllRooms(p3);
+//		
+//		for (Room r : options.keySet()) {	
+//			System.out.println(r + ": " + options.get(r));
+//		}
 		
 //		path = b.getBestPathTo(p1, Room.Spa);
 //		b.setPlayerPosition(p1, path.get(path.size()-1));
