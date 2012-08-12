@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
+import java.util.Set;
 
 
 import CluedoGame.Board.Board;
@@ -26,16 +27,16 @@ public class CluedoGame {
 
 	//all players in game. Useful for iterating over to get refuter since dead players
 	//still have to refute if they can
-	private List<Player> allPlayers;
+	private List<CluedoPlayer> allPlayers;
 
 	//players currently playing the game
-	private Queue<Player> livePlayers;
+	private Queue<CluedoPlayer> livePlayers;
 
 	//players who made incorrect accusation and lost
-	private List<Player> deadPlayers;
+	private List<CluedoPlayer> deadPlayers;
 
 	//character who is taking current turn
-	private Player currentPlayer;
+	private CluedoPlayer currentPlayer;
 
 	//current overall game state. True if a correct murder accusation or only 1 player left
 	private boolean gameFinished;
@@ -45,7 +46,7 @@ public class CluedoGame {
 	private int stepsRemaining;
 
 	//refute player and if the game is currently in the 'refute' state
-	private Player toRefute;
+	private CluedoPlayer toRefute;
 	private boolean refuteMode;
 	private List<Card> suggestion;
 
@@ -53,7 +54,7 @@ public class CluedoGame {
 	private List<Card> solution;
 
 	//once game is over, winner is stored here
-	private Player winner;
+	private CluedoPlayer winner;
 
 
 
@@ -76,8 +77,14 @@ public class CluedoGame {
 		//generate the players
 		initialisePlayers(numPlayers);
 
+		
 		//generate board
-		board = new Board(new HashSet<Player>(allPlayers));
+		Set<Player> setPlayers = new HashSet<Player>();
+		for (CluedoPlayer p: this.allPlayers){
+			setPlayers.add((Player)p);
+		}
+		board = new Board(new HashSet<Player>(setPlayers));
+		
 
 		//initialise variables
 		hasRolled = hasSuggested = hasEnteredRoom = hasUsedSecretPassage = false;
@@ -107,9 +114,9 @@ public class CluedoGame {
 	 * @param num the number of players we want to generate
 	 */
 	private void initialisePlayers(int num) {
-		allPlayers = new ArrayList<Player>();
-		livePlayers = new LinkedList<Player>();
-		deadPlayers = new ArrayList<Player>();
+		allPlayers = new ArrayList<CluedoPlayer>();
+		livePlayers = new LinkedList<CluedoPlayer>();
+		deadPlayers = new ArrayList<CluedoPlayer>();
 
 		//the lists used to allocate players their cards
 		List<Character> charas = new ArrayList<Character>();
@@ -138,7 +145,7 @@ public class CluedoGame {
 
 		//now we generate the player with their range of cards
 		for (int i = 0; i < num; i++) {
-			Player p = new Player(playerCharas.get(i),
+			CluedoPlayer p = new Player(playerCharas.get(i),
 					charas.subList(	i * charas.size()  / num, 	(i + 1) * charas.size()  / num),
 					weapons.subList(i * weapons.size() / num, 	(i + 1) * weapons.size() / num),
 					rooms.subList(	i * rooms.size()   / num, 	(i + 1) * rooms.size()   / num));
@@ -168,7 +175,7 @@ public class CluedoGame {
 	 * 
 	 * @return the winner or null
 	 */
-	public Player getWinner() {
+	public CluedoPlayer getWinner() {
 		return winner;
 	}
 
@@ -177,7 +184,7 @@ public class CluedoGame {
 	 * @param player
 	 * @return 
 	 */
-	public boolean isTurn(Player player) {
+	public boolean isTurn(CluedoPlayer player) {
 		return currentPlayer != null && currentPlayer.equals(player);
 	}
 
@@ -194,7 +201,7 @@ public class CluedoGame {
 	 * 
 	 * @return
 	 */
-	public Player getCurrentPlayer() {
+	public CluedoPlayer getCurrentPlayer() {
 		return currentPlayer;
 	}
 
@@ -207,7 +214,7 @@ public class CluedoGame {
 	 * @param player player we want info for
 	 * @return 
 	 */
-	public Map<Room, Integer> getRoomSteps(Player player) throws InvalidMoveException {
+	public Map<Room, Integer> getRoomSteps(CluedoPlayer player) throws InvalidMoveException {
 		if (gameFinished) {
 			throw new InvalidMoveException("Cannot get best paths after game is finished!");
 		} else if (deadPlayers.contains(player)) {	//use dead players since current player is polled from livePlayers
@@ -215,7 +222,7 @@ public class CluedoGame {
 		}
 
 		//should be okay to return best path now
-		return board.getDistanceToAllRooms(player);
+		return board.getDistanceToAllRooms(player.getCharacter());
 	}
 
 	/**
@@ -425,7 +432,7 @@ public class CluedoGame {
 
 		//should be okay to move, so perform logic
 		//find the shortest path to a door of the given room
-		List<Square> path = board.getBestPathTo(currentPlayer, room);
+		List<Square> path = board.getBestPathTo(currentPlayer.getCharacter(), room);
 
 		//there was no valid path to the given room
 		if (path.size() == 0) {
@@ -439,7 +446,7 @@ public class CluedoGame {
 		//then move as many steps as the player has left to that location
 		for (int i = 1; i < path.size() && stepsRemaining != 0; i++) {
 			//move
-			board.setPlayerPosition(currentPlayer, path.get(i));
+			board.setPlayerPosition(currentPlayer.getCharacter(), path.get(i));
 			stepsRemaining--;
 		}
 
@@ -483,7 +490,7 @@ public class CluedoGame {
 
 		//move the player
 		try {
-			board.useSecretPassage(currentPlayer);
+			board.useSecretPassage(currentPlayer.getCharacter());
 		} catch (IllegalArgumentException e) {
 			//should never happen. If it does, we crash the game with an informative message
 			throw new Error("Internal game errror.\n" + 
@@ -535,7 +542,7 @@ public class CluedoGame {
 	 * @return player to refute. null if no-one can refute
 	 * @throws InvalidMoveException if not in refute state
 	 */
-	public Player getRefuter() throws InvalidMoveException {
+	public CluedoPlayer getRefuter() throws InvalidMoveException {
 		if (!refuteMode) {
 			throw new InvalidMoveException("There's no suggestion to refute!");
 		}
@@ -566,8 +573,12 @@ public class CluedoGame {
 		return null;
 	}
 
-	public Map<Card, Boolean> getNotepad(Player player) {
+	public Map<Card, Boolean> getNotepad(CluedoPlayer player) {
 		return player.getNotepad();
+	}
+	
+	public List<Card> getCards(CluedoPlayer player){
+		return player.getCards();
 	}
 	
 	public enum Command {

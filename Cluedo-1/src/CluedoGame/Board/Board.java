@@ -53,21 +53,26 @@ public class Board {
 
 	// player info
 	// ------------
-	private Map<Player, Cell> playerPos;	// map from Player to their location cell
-
+	private Map<Character, Cell> playerPos;	// map from Player to their location cell
+	private Map<Character, MoveableCharacter> players;
+	
+	
 	/**
 	 * Constructor for Board. Takes a set of players as an argument(to ensure there are no duplicates).
 	 * 
 	 * @param currPlayers
 	 */
-	public Board(Set<Player> currPlayers) {
+	public Board(Set<? extends MoveableCharacter> currPlayers) {
 		// set up fields
-		this.playerPos = new HashMap<Player, Cell>();
+		this.playerPos = new HashMap<Character, Cell>();
 		this.rooms = new HashMap<Room, Cell>();
 		this.intrigueCells = new HashSet<CorridorCell>();
+		this.players = new HashMap<Character, MoveableCharacter>();
 
 		// create the board
 		char[][] rawData = this.readFromFile();
+		if (rawData == null){System.exit(1);}
+		
 		this.constructBoard(rawData);
 
 		// add the players
@@ -86,13 +91,13 @@ public class Board {
 	 * @throws - IllegalArgumentException if the player cannot get to the square
 	 *         specified, or if it is already in the square specified.
 	 */
-	public void setPlayerPosition(Player player, Square newPosition) throws IllegalArgumentException {
+	public void setPlayerPosition(Character player, Square newPosition) throws IllegalArgumentException {
 		Cell newPos = (Cell) newPosition;
 
 		// sanity checks	
-		if (newPos.equals(player.getPosition())) {
+		if (newPos.equals(playerPos.get(player))) {
 			throw new IllegalArgumentException(
-					"You are already in that location: " + player.getPosition());
+					"You are already in that location: " + playerPos.get(player));
 		}
 		if (newPos instanceof CorridorCell
 				&& ((CorridorCell) newPos).isBlocked()) {
@@ -117,7 +122,7 @@ public class Board {
 		playerPos.put(player, newPos);
 
 		// update the Player's position
-		player.setPosition(newPos);
+		players.get(player).setPosition(newPos);
 	}
 
 	
@@ -129,8 +134,8 @@ public class Board {
 	 * @param room
 	 */
 	public void summonCharacter(Character chara, Room room) {
-		for (Player p : playerPos.keySet()) {
-			if (p.getCharacter().equals(chara)) {
+		for (Character p : playerPos.keySet()) {
+			if (p.equals(chara)) {
 				this.setPlayerPosition(p, rooms.get(room));
 			}
 		}
@@ -144,18 +149,18 @@ public class Board {
 	 * @throws IllegalArgumentException
 	 *             if the player isn't in a room with a secret passage.
 	 */
-	public void useSecretPassage(Player player) throws IllegalArgumentException{
-		Cell position = playerPos.get(player);
+	public void useSecretPassage(Character chara) throws IllegalArgumentException{
+		Cell position = playerPos.get(chara);
 
 		// check they are in a corner room
 		if (!position.isCornerRoom()) {
-			throw new IllegalArgumentException("Player " + player
+			throw new IllegalArgumentException("Player " + chara
 					+ "must be in a room with a secret passage.");
 		}
 
 		// if player is in corner room, move them
 		RoomCell room = (RoomCell) position;
-		setPlayerPosition(player, room.getSecretPassageDest());
+		setPlayerPosition(chara, room.getSecretPassageDest());
 	}
 
 	
@@ -169,17 +174,17 @@ public class Board {
 	 * to reach each room on the board (and the closest intrigue). If there is no path to the 
 	 * room, the distance will be -1.
 	 * 
-	 * @param player
+	 * @param chara
 	 * @return - Map<Room, Integer> that maps number of moves to all rooms 
 	 */
-	public Map<Room, Integer> getDistanceToAllRooms(Player player) {
+	public Map<Room, Integer> getDistanceToAllRooms(Character chara) {
 		Map<Room, Integer> options = new HashMap<Room, Integer>();
 		// calculate path length to each room and add to map.
 		Room[] rooms = Room.values();
 		for (int i = 0; i < rooms.length; i++) {
 			Room room = rooms[i];
 			if (room != Room.Corridor) {
-				List<Square> path = this.getBestPathTo(player, room);
+				List<Square> path = this.getBestPathTo(chara, room);
 				options.put(room, path.size() - 1);
 			}
 		}
@@ -194,13 +199,13 @@ public class Board {
 	 * 
 	 * If a path cannot be found, it will return an empty list.
 	 * 
-	 * @param player
+	 * @param chara
 	 * @param p
 	 * @return
 	 */
-	public List<Square> getBestPathTo(Player player, Point p) {
+	public List<Square> getBestPathTo(Character chara, Point p) {
 		// get the start and goal cells
-		Cell s = (Cell) player.getPosition();
+		Cell s = (Cell) players.get(chara).getPosition();
 		Cell g = (Cell) this.getSquare(p);
 		return this.getBestPathBetween(s, g);
 	}
@@ -212,13 +217,13 @@ public class Board {
 	 * 
 	 * If a path cannot be found, it will return an empty list.
 	 * 
-	 * @param player
+	 * @param chara
 	 * @param p
 	 * @return
 	 */
-	public List<Square> getBestPathTo(Player player, Square destination) {
+	public List<Square> getBestPathTo(Character chara, Square destination) {
 		// get the start cell
-		Cell start = (Cell) player.getPosition();
+		Cell start = (Cell) players.get(chara).getPosition();
 		return this.getBestPathBetween(start, (Cell) destination);
 	}
 
@@ -229,19 +234,19 @@ public class Board {
 	 * 
 	 * If a path cannot be found, it will return an empty list.
 	 * 
-	 * @param player
+	 * @param chara
 	 * @param p
 	 * @return
 	 */
-	public List<Square> getBestPathTo(Player player, Room room) {
+	public List<Square> getBestPathTo(Character chara, Room room) {
 		// get the start cell
-		Cell s = (Cell) player.getPosition();
+		Cell s = (Cell) players.get(chara).getPosition();
 		Cell g = null;
 		List<Square> path = new ArrayList<Square>();
 		
 		// get goal cell
 		if (room == Room.Intrigue) {
-			g = this.getClosestIntrigue(player);// if room is intrigue, goal is the closest one.
+			g = this.getClosestIntrigue(chara);// if room is intrigue, goal is the closest one.
 		} else { // otherwise get the room
 			g = rooms.get(room);
 		}
@@ -319,10 +324,9 @@ public class Board {
 		}
 
 		// draw in characters
-		for (Player p: playerPos.keySet()){
-			Cell cell = playerPos.get(p);
+		for (Character c: playerPos.keySet()){
+			Cell cell = playerPos.get(c);
 			Point point = cell.getPosition();
-			Character c = p.getCharacter();	
 			if(c == Character.Scarlett){path[point.y][point.x] = '1';}
 			if(c == Character.Mustard){path[point.y][point.x] = '2';}
 			if(c == Character.White){path[point.y][point.x] = '3';}
@@ -395,7 +399,7 @@ public class Board {
 			// recorded
 			for (int i = 0; i < sEntrances.size(); i++) {
 				for (int j = 0; j < gEntrances.size(); j++) {
-					List<Square> path = this.getBestPathBetween(
+					List<Square> path = this.findBestPath(
 							sEntrances.get(i), gEntrances.get(j));
 					if (path != null && path.size() < bestSize) {
 						bestPath = path;
@@ -420,7 +424,7 @@ public class Board {
 			// check them all, and save the path if its better than already
 			// recorded
 			for (int i = 0; i < sEntrances.size(); i++) {
-				List<Square> path = this.getBestPathBetween(sEntrances.get(i),
+				List<Square> path = this.findBestPath(sEntrances.get(i),
 						goal);
 				if (path != null && path.size() < bestSize) {
 					bestPath = path;
@@ -443,7 +447,7 @@ public class Board {
 			// check them all, and save the path if its better than already
 			// recorded
 			for (int i = 0; i < gEntrances.size(); i++) {
-				List<Square> path = this.getBestPathBetween(start,
+				List<Square> path = this.findBestPath(start,
 						gEntrances.get(i));
 				if (path != null && path.size() < bestSize) {
 					bestPath = path;
@@ -460,7 +464,7 @@ public class Board {
 		// d. if both are corridors:
 		// -----------------------
 		else {
-			List<Square> path = this.getBestPathBetween((CorridorCell) s,
+			List<Square> path = this.findBestPath((CorridorCell) s,
 					(CorridorCell) g);
 			if (path != null) {
 				bestPath = path;
@@ -484,7 +488,7 @@ public class Board {
 	 * @param goal - the goal Cell
 	 * @return
 	 */
-	private List<Square> getBestPathBetween(CorridorCell start,
+	private List<Square> findBestPath(CorridorCell start,
 			CorridorCell goal) {
 
 		// 1. initialise everything
@@ -612,17 +616,17 @@ public class Board {
 	 * This is a private method that returns the closest intrigue square to the
 	 * given player.
 	 * 
-	 * @param player
+	 * @param chara
 	 * @return - returns null if no intrigue square is accessible.
 	 */
-	private Cell getClosestIntrigue(Player player) {
+	private Cell getClosestIntrigue(Character chara) {
 		List<Square> bestPath = null;
 		int bestDistance = Integer.MAX_VALUE;
 
 		// go through and find the smallest path between current position and
 		// all the intrigue squares
 		for (CorridorCell intr : intrigueCells) {
-			List<Square> path = this.getBestPathBetween(this.playerPos.get(player),
+			List<Square> path = this.getBestPathBetween(this.playerPos.get(chara),
 					intr);
 			if (path.size() > 0 && path.size() < bestDistance) {
 				bestPath = path;
@@ -932,14 +936,15 @@ public class Board {
 	 * 
 	 * @param currPlayers
 	 */
-	private void addPlayers(Collection<Player> currPlayers) {
+	private void addPlayers(Collection<? extends MoveableCharacter> currPlayers) {
 		// put the characters on the board at their starting locations, and
 		// update the Player's position
 		// ----------------------------------------------------------------------------------------------
-		for (Player p : currPlayers) {
+		for (MoveableCharacter p : currPlayers) {
 			// set player position to their default start position.
 			Cell start = startingCells.get(p.getCharacter());
-			setPlayerPosition(p, start);
+			players.put(p.getCharacter(), p);
+			setPlayerPosition(p.getCharacter(), start);
 		}
 	}
 
@@ -953,30 +958,22 @@ public class Board {
 	public static void main(String[] args) {
 
 		// create a set of players
-		Set<Player> players = new HashSet<Player>();
+		Set<MoveableCharacter> players = new HashSet<MoveableCharacter>();
 
 		List<Weapon> weapon = new ArrayList<Weapon>();
 		List<Room> room = new ArrayList<Room>();
 		List<Character> chara = new ArrayList<Character>();
 
-		Player p1 = new Player(Character.Scarlett, chara, weapon, room);
-		Player p2 = new Player(Character.Green, chara, weapon, room);
-		Player p3 = new Player(Character.Peacock, chara, weapon, room);
+		MoveableCharacter p1 = new Player(Character.Scarlett, chara, weapon, room);
+		MoveableCharacter p2 = new Player(Character.Green, chara, weapon, room);
+		MoveableCharacter p3 = new Player(Character.Peacock, chara, weapon, room);
 		players.add(p1);
 		players.add(p2);
 		players.add(p3);
 
-		// create the board
-		Board b = new Board(players);
 
-		// testing pathfinding
-		List<Square> path = b.getBestPathTo(p3, Room.Intrigue);
 
-		try{
-			for (int i = 1; i < path.size(); i++ ){
-				b.setPlayerPosition(p3, path.get(i));
-			}
-		} catch (IllegalArgumentException e){System.out.println(e.getMessage());}
+
 			
 			
 			

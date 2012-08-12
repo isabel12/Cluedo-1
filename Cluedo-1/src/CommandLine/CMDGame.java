@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import CluedoGame.Card;
 import CluedoGame.CluedoGame;
+import CluedoGame.CluedoPlayer;
 import CluedoGame.InvalidMoveException;
 import CluedoGame.Player;
 import CluedoGame.Character;
@@ -25,7 +26,7 @@ import CommandLine.Parser.Command;
 public class CMDGame {
 
 	//player currently taking turn
-	private Player player;
+	private CluedoPlayer player;
 
 	//the current game object
 	private CluedoGame game;
@@ -40,6 +41,7 @@ public class CMDGame {
 			game = new CluedoGame(getNumberPlayers());
 		} catch (Exception e) {
 			System.out.println("Error making game");
+			e.printStackTrace();
 			System.exit(-1);
 		}
 
@@ -179,7 +181,7 @@ public class CMDGame {
 			game.makeSuggestion(chara, weapon);
 
 			//get refuting player
-			Player refuter = game.getRefuter();
+			CluedoPlayer refuter = game.getRefuter();
 
 			if (refuter != null) {
 				System.out.println(refuter + " must refute!");
@@ -305,7 +307,7 @@ public class CMDGame {
 	 * Prints the given players notepad.
 	 * @param player
 	 */
-	private void printNotepad(Player player) {
+	private void printNotepad(CluedoPlayer player) {
 		System.out.println(player + "'s notepad:\n");
 		List<Card> possible = new ArrayList<Card>();
 		List<Card> notPossible = new ArrayList<Card>();
@@ -343,7 +345,7 @@ public class CMDGame {
 	 * 	-	end turn
 	 * @param player
 	 */
-	private void printCommands(Player player) {
+	private void printCommands(CluedoPlayer player) {
 		List<CluedoGame.Command> commands = game.getCommands();
 		
 		for (CluedoGame.Command c: commands) {
@@ -355,7 +357,7 @@ public class CMDGame {
 	 * Prints the locations and number of optimal steps relative to given player.
 	 * @param player
 	 */
-	private void printLocations(Player player) {	
+	private void printLocations(CluedoPlayer player) {	
 		try {
 			Map<Room, Integer> rooms = game.getRoomSteps(player);
 
@@ -380,7 +382,7 @@ public class CMDGame {
 	 * Prints the given players cards.
 	 * @param player the player we are printing from
 	 */
-	private void printCards(Player player) {
+	private void printCards(CluedoPlayer player) {
 		System.out.println(player + " has:");
 		for (Card c: player.getCards())	System.out.println("\t" + c);
 	}

@@ -5,13 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import CluedoGame.Board.MoveableCharacter;
+
 
 /**
  * Class represents a player in the Cluedo game.
  * @author Troy Shaw
  *
  */
-public class Player {
+public class Player implements CluedoPlayer, MoveableCharacter {
 
 	//their piece on the board
 	private Character character;
