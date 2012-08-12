@@ -110,9 +110,9 @@ public class CluedoGameTests {
 		List<Card> allCards = new ArrayList<Card>();
 
 		for (int i = 0; i < 3; i++) {
-			CluedoPlayer player = game.getCurrentPlayer();
+			Character player = game.getCurrentPlayer();
 
-			for (Card c: player.getCards()) {
+			for (Card c: game.getCards(player)) {
 				if (allCards.contains(c)) fail("Shouldn't be in deck!");
 				allCards.add(c);
 			}
@@ -150,8 +150,10 @@ public class CluedoGameTests {
 			fail("Nobody to refute at start of game");
 		} catch (InvalidMoveException e) {
 		}
+		
+		Character winner = game.getWinner();
 
-		assertTrue("No winner at start!", game.getWinner() == null);
+		assertTrue("No winner at start!", winner == null);
 
 		assertFalse("Nothing to refute at start!", game.isRefuting());
 
@@ -182,10 +184,10 @@ public class CluedoGameTests {
 		}
 		
 		for (int i = 0; i < 3; i++) {
-			CluedoPlayer p = game.getCurrentPlayer();
+			Character p = game.getCurrentPlayer();
 			
-			for (Card c: p.getCards()) {
-				assertTrue("Should be marked as innocent!", p.getNotepad().get(c));
+			for (Card c: game.getCards(p)) {
+				assertTrue("Should be marked as innocent!", game.getNotepad(p).get(c));
 			}
 			
 			try {
@@ -275,7 +277,7 @@ public class CluedoGameTests {
 				fail();
 			}
 			
-			CluedoPlayer p = game.getCurrentPlayer();
+			Character p = game.getCurrentPlayer();
 			for (int j = 0; j < i - 1; j++) {
 				try {
 					game.endTurn();

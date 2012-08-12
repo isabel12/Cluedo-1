@@ -10,7 +10,6 @@ import CluedoGame.Card;
 import CluedoGame.CluedoGame;
 import CluedoGame.CluedoPlayer;
 import CluedoGame.InvalidMoveException;
-import CluedoGame.Player;
 import CluedoGame.Character;
 import CluedoGame.Room;
 import CluedoGame.Weapon;
@@ -26,7 +25,7 @@ import CommandLine.Parser.Command;
 public class CMDGame {
 
 	//player currently taking turn
-	private CluedoPlayer player;
+	private Character player;
 
 	//the current game object
 	private CluedoGame game;
@@ -79,7 +78,14 @@ public class CMDGame {
 
 			//iterate while they haven't ended their turn
 			while (game.isTurn(player)) {
+				
+				// print legal command options
+				System.out.println();
 				System.out.println("What will " + player + " do? ([help] to print commands) ");
+				System.out.println("Valid actions:");
+				this.printCommands(player);
+				
+				
 
 				commandStr = scan.nextLine();
 				command = parser.parseCommand(commandStr);
@@ -181,7 +187,7 @@ public class CMDGame {
 			game.makeSuggestion(chara, weapon);
 
 			//get refuting player
-			CluedoPlayer refuter = game.getRefuter();
+			Character refuter = game.getRefuter();
 
 			if (refuter != null) {
 				System.out.println(refuter + " must refute!");
@@ -239,7 +245,7 @@ public class CMDGame {
 			System.out.println("Moving towards " + room.toString());
 			sleep(500);
 			if (completed) {
-				System.out.println("You moved all the way to " + player.getPosition().getRoom());
+				System.out.println("You moved all the way to " + game.getPosition(player).getRoom());
 			} else {
 				System.out.println("You didn't have enough steps to make it all the way.");
 			}
@@ -307,7 +313,7 @@ public class CMDGame {
 	 * Prints the given players notepad.
 	 * @param player
 	 */
-	private void printNotepad(CluedoPlayer player) {
+	private void printNotepad(Character player) {
 		System.out.println(player + "'s notepad:\n");
 		List<Card> possible = new ArrayList<Card>();
 		List<Card> notPossible = new ArrayList<Card>();
@@ -345,7 +351,7 @@ public class CMDGame {
 	 * 	-	end turn
 	 * @param player
 	 */
-	private void printCommands(CluedoPlayer player) {
+	private void printCommands(Character player) {
 		List<CluedoGame.Command> commands = game.getCommands();
 		
 		for (CluedoGame.Command c: commands) {
@@ -357,7 +363,7 @@ public class CMDGame {
 	 * Prints the locations and number of optimal steps relative to given player.
 	 * @param player
 	 */
-	private void printLocations(CluedoPlayer player) {	
+	private void printLocations(Character player) {	
 		try {
 			Map<Room, Integer> rooms = game.getRoomSteps(player);
 
@@ -382,9 +388,9 @@ public class CMDGame {
 	 * Prints the given players cards.
 	 * @param player the player we are printing from
 	 */
-	private void printCards(CluedoPlayer player) {
+	private void printCards(Character player) {
 		System.out.println(player + " has:");
-		for (Card c: player.getCards())	System.out.println("\t" + c);
+		for (Card c: game.getCards(player))	System.out.println("\t" + c);
 	}
 
 	/**

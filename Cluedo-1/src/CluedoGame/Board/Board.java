@@ -45,7 +45,6 @@ public class Board {
 	private Map<Character, Cell> startingCells; // a map to keep track of where characters start. I won't make a new type of Cell for now.
 	private Set<CorridorCell> intrigueCells; // a set of the intrigue cells on the board
 	private Map<Room, Cell> rooms; // a map from 'Room' to cell
-	private final Room finalRoom = Room.SwimmingPool; // the final room
 
 	// dimensions of the board
 	private int cols;

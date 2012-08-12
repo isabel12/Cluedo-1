@@ -2,6 +2,7 @@ package CluedoGame;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +29,7 @@ public class CluedoGame {
 	//all players in game. Useful for iterating over to get refuter since dead players
 	//still have to refute if they can
 	private List<CluedoPlayer> allPlayers;
+	private Map<Character, CluedoPlayer> playerRefs; // map from Character to CluedoPlayer for easy lookup
 
 	//players currently playing the game
 	private Queue<CluedoPlayer> livePlayers;
@@ -115,6 +117,7 @@ public class CluedoGame {
 	 */
 	private void initialisePlayers(int num) {
 		allPlayers = new ArrayList<CluedoPlayer>();
+		playerRefs = new HashMap<Character, CluedoPlayer>();
 		livePlayers = new LinkedList<CluedoPlayer>();
 		deadPlayers = new ArrayList<CluedoPlayer>();
 
@@ -149,9 +152,10 @@ public class CluedoGame {
 					charas.subList(	i * charas.size()  / num, 	(i + 1) * charas.size()  / num),
 					weapons.subList(i * weapons.size() / num, 	(i + 1) * weapons.size() / num),
 					rooms.subList(	i * rooms.size()   / num, 	(i + 1) * rooms.size()   / num));
-			//then add it to our two collections;
+			//then add it to our collections;
 			allPlayers.add(p);
 			livePlayers.add(p);
+			playerRefs.put(p.getCharacter(),p);
 		}
 	}
 
@@ -175,8 +179,10 @@ public class CluedoGame {
 	 * 
 	 * @return the winner or null
 	 */
-	public CluedoPlayer getWinner() {
-		return winner;
+	public Character getWinner() {
+		if (winner == null){ return null;}
+		
+		return winner.getCharacter();
 	}
 
 	/**
@@ -184,8 +190,8 @@ public class CluedoGame {
 	 * @param player
 	 * @return 
 	 */
-	public boolean isTurn(CluedoPlayer player) {
-		return currentPlayer != null && currentPlayer.equals(player);
+	public boolean isTurn(Character player) {
+		return currentPlayer != null && currentPlayer.getCharacter().equals(player);
 	}
 
 	/**
@@ -201,8 +207,8 @@ public class CluedoGame {
 	 * 
 	 * @return
 	 */
-	public CluedoPlayer getCurrentPlayer() {
-		return currentPlayer;
+	public Character getCurrentPlayer() {
+		return currentPlayer.getCharacter();
 	}
 
 
@@ -214,15 +220,15 @@ public class CluedoGame {
 	 * @param player player we want info for
 	 * @return 
 	 */
-	public Map<Room, Integer> getRoomSteps(CluedoPlayer player) throws InvalidMoveException {
+	public Map<Room, Integer> getRoomSteps(Character player) throws InvalidMoveException {
 		if (gameFinished) {
 			throw new InvalidMoveException("Cannot get best paths after game is finished!");
-		} else if (deadPlayers.contains(player)) {	//use dead players since current player is polled from livePlayers
+		} else if (deadPlayers.contains(playerRefs.get(player))) {	//use dead players since current player is polled from livePlayers
 			throw new InvalidMoveException("Cannot get best paths for a dead player!");
 		}
 
 		//should be okay to return best path now
-		return board.getDistanceToAllRooms(player.getCharacter());
+		return board.getDistanceToAllRooms(player);
 	}
 
 	/**
@@ -542,7 +548,7 @@ public class CluedoGame {
 	 * @return player to refute. null if no-one can refute
 	 * @throws InvalidMoveException if not in refute state
 	 */
-	public CluedoPlayer getRefuter() throws InvalidMoveException {
+	public Character getRefuter() throws InvalidMoveException {
 		if (!refuteMode) {
 			throw new InvalidMoveException("There's no suggestion to refute!");
 		}
@@ -561,7 +567,7 @@ public class CluedoGame {
 					toRefute = allPlayers.get(i);
 					refuteMode = true;
 
-					return toRefute;
+					return toRefute.getCharacter();
 				}
 			}
 		}
@@ -573,12 +579,31 @@ public class CluedoGame {
 		return null;
 	}
 
-	public Map<Card, Boolean> getNotepad(CluedoPlayer player) {
-		return player.getNotepad();
+	/**
+	 * Returns the given player's notepad.
+	 * @param player
+	 * @return
+	 */
+	public Map<Card, Boolean> getNotepad(Character player) {
+		return playerRefs.get(player).getNotepad();
 	}
 	
-	public List<Card> getCards(CluedoPlayer player){
-		return player.getCards();
+	/**
+	 * Returns the cards of the given player.
+	 * @param player
+	 * @return
+	 */
+	public List<Card> getCards(Character player){
+		return playerRefs.get(player).getCards();
+	}
+	
+	/**
+	 * Returns the position of the given character on the board
+	 * @param chara
+	 * @return
+	 */
+	public Square getPosition(Character chara){
+		return playerRefs.get(chara).getPosition();
 	}
 	
 	public enum Command {
