@@ -53,10 +53,10 @@ public class Board {
 
 	// player info
 	// ------------
-	private Map<Player, Cell> playerPos;
+	private Map<Player, Cell> playerPos;	// map from Player to their location cell
 
 	/**
-	 * Constructor for Board. Takes a set of players as an argument(to ensure there are no duplicates)
+	 * Constructor for Board. Takes a set of players as an argument(to ensure there are no duplicates).
 	 * 
 	 * @param currPlayers
 	 */
@@ -103,8 +103,7 @@ public class Board {
 			throw new IllegalArgumentException(
 					"There is no valid path to the square specified: " + newPos);
 		}
-
-		
+	
 		// set current Cell to empty
 		Cell currPos = playerPos.get(player);
 		if (currPos != null) {
@@ -159,18 +158,19 @@ public class Board {
 		setPlayerPosition(player, room.getSecretPassageDest());
 	}
 
+	
+	
 	// ========================================================================
 	// Queries about the Player's location on the board
 	// ========================================================================
 
-	
 	/**
 	 * This method returns a map containing the moves it would take the player
-	 * to reach each room on the board. If there is no path to the room, the
-	 * distance will be -1.
+	 * to reach each room on the board (and the closest intrigue). If there is no path to the 
+	 * room, the distance will be -1.
 	 * 
 	 * @param player
-	 * @return
+	 * @return - Map<Room, Integer> that maps number of moves to all rooms 
 	 */
 	public Map<Room, Integer> getDistanceToAllRooms(Player player) {
 		Map<Room, Integer> options = new HashMap<Room, Integer>();
@@ -273,7 +273,7 @@ public class Board {
 	
 	/**
 	 * Draw's a textual representation of the map, with the path given drawn in
-	 * asterisks (also draws it for you)
+	 * asterisks.
 	 * 
 	 * @param pathToDraw
 	 * @return
@@ -303,10 +303,10 @@ public class Board {
 	
 	
 	/**
-	 * Draws a text based representation of the board, with player locations
+	 * Draws a text based representation of the board, with player locations.  
 	 * @return
 	 */
-	public char[][] drawBoard(){
+	public void drawBoard(){
 		char[][] path = this.readFromFile();
 
 		// clear staring positions.
@@ -317,15 +317,6 @@ public class Board {
 
 			path[row][col] = '.'; 
 		}
-
-//		// replace '.' with ' '
-//		for (int i = 0; i < rows; i++) {
-//			for (int j = 0; j < cols; j++) {
-//				if (path[i][j] == '.') {
-//					path[i][j] = ' ';
-//				} 
-//			}
-//		}
 
 		// draw in characters
 		for (Player p: playerPos.keySet()){
@@ -350,7 +341,6 @@ public class Board {
 		}
 		System.out.println();
 
-		return path;
 	}
 		
 		
@@ -374,9 +364,9 @@ public class Board {
 	 * 
 	 * If there is no path, it will return an empty list.
 	 * 
-	 * @param s
-	 * @param g
-	 * @return
+	 * @param s - the starting Cell
+	 * @param g - the goal Cell
+	 * @return - a list containing the Squares in the path (empty list if there isn't one)
 	 */
 	private List<Square> getBestPathBetween(Cell s, Cell g) {
 
@@ -482,7 +472,7 @@ public class Board {
 
 	/**
 	 * This method returns the optimum unobstructed path in the form of a
-	 * List<Cell>, where the first entry is the starting Cell, and the last the
+	 * List<Square>, where the first entry is the starting Cell, and the last the
 	 * goal Cell.
 	 * 
 	 * This method implements the slow version of the A* search algorithm, and
@@ -490,14 +480,12 @@ public class Board {
 	 * best path from the Player's current position to the cell at the given
 	 * point.
 	 * 
-	 * @param player
-	 * @param p
+	 * @param start - the starting Cell
+	 * @param goal - the goal Cell
 	 * @return
 	 */
 	private List<Square> getBestPathBetween(CorridorCell start,
 			CorridorCell goal) {
-		
-
 
 		// 1. initialise everything
 		// -------------------------
@@ -604,8 +592,8 @@ public class Board {
 	 * 
 	 * @param start - the starting Cell.
 	 * @param goal - the end Cell.
-	 * @throws - IllegalArgumentException if given a RoomCell
 	 * @return - the estimated path length between the given cells
+	 * @throws - IllegalArgumentException if given a RoomCell
 	 */
 	private int getEstimate(Cell start, Cell goal) throws IllegalArgumentException {
 		if (start instanceof RoomCell || goal instanceof RoomCell) {
@@ -624,17 +612,17 @@ public class Board {
 	 * This is a private method that returns the closest intrigue square to the
 	 * given player.
 	 * 
-	 * @param p
+	 * @param player
 	 * @return - returns null if no intrigue square is accessible.
 	 */
-	private Cell getClosestIntrigue(Player p) {
+	private Cell getClosestIntrigue(Player player) {
 		List<Square> bestPath = null;
 		int bestDistance = Integer.MAX_VALUE;
 
 		// go through and find the smallest path between current position and
 		// all the intrigue squares
 		for (CorridorCell intr : intrigueCells) {
-			List<Square> path = this.getBestPathBetween(this.playerPos.get(p),
+			List<Square> path = this.getBestPathBetween(this.playerPos.get(player),
 					intr);
 			if (path.size() > 0 && path.size() < bestDistance) {
 				bestPath = path;
@@ -706,6 +694,38 @@ public class Board {
 	 * puts the cells into the map array, connects the Cells together to form a
 	 * traversible graph, and puts the characters that are playing on their
 	 * starting positions.
+	 * 
+	 * Key 
+	 * ===
+	 * Rooms (entrance square lower case)
+	 * -----
+	 * s = spa
+	 * t = theatre
+	 * l = living room
+	 * o = observatory
+	 * p = patio
+	 * h = hall
+	 * k = kitchen
+	 * d = dining room
+	 * g = guest house
+	 * w = swimming pool
+	 *
+	 * Corridor (movable squares)
+	 * --------------------------
+	 * ? = question mark square
+	 * . = moveable square	(players can walk here)
+	 *
+	 * Player start positions:
+	 * -----------------------
+	 * 6 = Victor Plum
+	 * 5 = Eleanor Peacock
+	 * 4 = Jacob Green
+	 * 3 = Diane White
+	 * 2 = Jack Mustard
+	 * 1 = Kasandra Scarlett
+	 * 
+	 * 
+	 * @param - a 2D char[][] representing the board.
 	 */
 	private void constructBoard(char[][] rawData) {
 		// initialise the Board structure, and startingCells map
@@ -868,7 +888,7 @@ public class Board {
 
 	/**
 	 * This method connects the given corridor cell to its surrounding
-	 * neighbours (if they are also corridor cells).
+	 * neighbours on the board (if the neighbour is a corridor cell, and not itself)
 	 * 
 	 * @param corridor
 	 */
@@ -923,6 +943,8 @@ public class Board {
 		}
 	}
 
+	
+	
 	/**
 	 * For testing :)
 	 * 

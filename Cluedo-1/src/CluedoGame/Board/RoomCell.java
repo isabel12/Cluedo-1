@@ -6,7 +6,10 @@ import CluedoGame.*;
 
 
 /**
- * This class represents a Cell that is a room.  It has a position that is it's central square, and may be connected to another room via a secret passage.
+ * This class represents a Cell that is a room.  It has a position that is it's central square, 
+ * and may be connected to another room via a secret passage.
+ * 
+ * It 
  * 
  * @author Izzi
  *
@@ -19,10 +22,18 @@ public class RoomCell extends Cell {
 	
 	Point midPoint;
 
+	/**
+	 * Constructor for a new RoomCell.  
+	 * 
+	 * @param room - the room it represents
+	 * @param position - point (col, row) that represents the middle square of the room.
+	 * @param isFinalRoom - if the room is the final room for announcing the murder.
+	 */
 	public RoomCell(Room room, Point position, boolean isFinalRoom) {
 		super(position);
 		this.room = room;	
 		this.entrances = new ArrayList<CorridorCell>();
+		this.isFinalRoom = isFinalRoom;
 	}
 	
 	
@@ -31,30 +42,27 @@ public class RoomCell extends Cell {
 	//===============================================================
 	
 	/**
-	 * Sets the given room to be connected via a secret passage
-	 * @param room
+	 * Sets the given room as connected to this room via a secret passage
+	 * @param room - the room at the other end of the secret passage
 	 */
 	public void setSecretPassage(RoomCell room){
 		this.secretPassage = room;
 	}
 	
 	/**
-	 * Returns the Cell at the end of the secret passage 
-	 * @return
-	 * @throws - UnsupportedOperationException if the room doesn't have a secret passage <--- this can be changed, but thought it might help with debugging.
+	 * Returns the Cell at the end of the secret passage.
+	 * @return - null if there isn't one.
 	 */
 	public Cell getSecretPassageDest(){
-		if (this.secretPassage==null){
-			throw new UnsupportedOperationException(room + "doesn't have a secret passage.");
-		}
 		return this.secretPassage;
 	}
 	
 	
 	/**
-	 * This method is needed for finding paths.  If the start and destination are rooms with more than one entrance, 
-	 * then need to check all combinations, so accessing via index is necessary.
-	 * @return
+	 * This method is needed for finding paths.  If the start and destination are rooms 
+	 * with more than one entrance, then need to check all combinations, so accessing via 
+	 * index is necessary.
+	 * @return - the rooms entrances
 	 */
 	public List<CorridorCell> getEntrances(){
 		return this.entrances;	
@@ -152,7 +160,7 @@ public class RoomCell extends Cell {
 	}
 
 	/**
-	 * I've set this up for debugging purposes.  It can be changed later if necessary.
+	 * Prints the name of the room.
 	 */
 	@Override
 	public String toString(){
