@@ -15,7 +15,7 @@ import CluedoGame.Board.Board;
 
 
 /**
- * Represents an actual Cluedo game.
+ * Represents a Cluedo game.
  * One instantiates the game by supplying the number of players.
  * 
  * The game is played by calling appropriate methods, and querying the resulting state.
@@ -67,10 +67,11 @@ public class CluedoGame {
 	 * Players are assigned at random.
 	 * 
 	 * @param numPlayers number of players for this game
+	 * @throws Exception if player number is invalid
 	 */
-	public CluedoGame(int numPlayers) {
+	public CluedoGame(int numPlayers) throws Exception {
 		if (numPlayers < 3 || numPlayers > 6) {
-			// will have to do something here
+			throw new Exception("Cannot make a board with that many players!");
 		}
 
 		//generate the players
@@ -96,7 +97,6 @@ public class CluedoGame {
 		//must get room through method since enum has non-valid murder rooms
 		solution.add(Room.getMurderRooms().get(r.nextInt(Room.getMurderRooms().size())));
 
-		for (Card c: solution) System.out.println(c.toString());
 		//poll head of players as currentPlayer
 		currentPlayer = livePlayers.poll();
 	}
@@ -139,9 +139,6 @@ public class CluedoGame {
 
 		//now we generate the player with their range of cards
 		for (int i = 0; i < num; i++) {
-			//should be fair, but doesn't equally distribute because of int rounding
-			//can fix this later. Only unfair to first player when playing with 6 players
-			//all cards are distrubuted though
 			Player p = new Player(playerCharas.get(i),
 					charas.subList(	i * charas.size()  / num, 	(i + 1) * charas.size()  / num),
 					weapons.subList(i * weapons.size() / num, 	(i + 1) * weapons.size() / num),
@@ -212,8 +209,6 @@ public class CluedoGame {
 	 * @return 
 	 */
 	public Map<Room, Integer> getRoomSteps(Player player) throws InvalidMoveException {
-		for (Player p: livePlayers) System.out.println(p.getCharacter());
-
 		if (gameFinished) {
 			throw new InvalidMoveException("Cannot get best paths after game is finished!");
 		} else if (deadPlayers.contains(player)) {	//use dead players since current player is polled from livePlayers
@@ -270,7 +265,7 @@ public class CluedoGame {
 
 		//should be good to roll now
 		Random random = new Random();
-		for (int i = 0; i < 2; i++) {			//maybe a static int for # of dice
+		for (int i = 0; i < 2; i++) {
 			stepsRemaining += random.nextInt(6) + 1;
 		}
 
@@ -281,12 +276,21 @@ public class CluedoGame {
 	}
 
 
+	/**
+	 * Makes a suggestion with the given character and weapon.
+	 * Causes the game to enter 'refute-mode' if any player can refute.
+	 * Game stays in refute-mode until that player refutes with a valid card.
+	 * 
+	 * @param chara
+	 * @param weapon
+	 * @throws InvalidMoveException
+	 */
 	public void makeSuggestion(Character chara, Weapon weapon) throws InvalidMoveException{
 		if (gameFinished) {
 			throw new InvalidMoveException("Cannot make a suggestion once game is finished!");
 		} else if (hasSuggested) {
 			throw new InvalidMoveException("You have already suggested this turn!");
-		} else if (!currentPlayer.inRoom()) {	//needs to exclude pool-room!
+		} else if (!currentPlayer.inRoom()) {
 			throw new InvalidMoveException("Must be in a room to suggest!");
 		} else if (currentPlayer.inFinalRoom()) {
 			throw new InvalidMoveException("Cannot suggest from the pool-room!");
@@ -437,8 +441,6 @@ public class CluedoGame {
 		for (int i = 1; i < path.size() && stepsRemaining != 0; i++) {
 			//move
 			board.setPlayerPosition(currentPlayer, path.get(i));
-
-			//subtract 1 from players steps
 			stepsRemaining--;
 		}
 

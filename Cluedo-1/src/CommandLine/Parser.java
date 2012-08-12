@@ -24,13 +24,11 @@ public class Parser {
 		PrintNotepad,
 		MakeAccusation,
 		MakeSuggestion,
-		SelectCard,
 		SecretPassage,
 		EndTurn,
 		PrintCommands,
 		PrintCards,
 		PrintLocations,
-		PrintStatus,
 		Help,
 		Undefined
 	}
@@ -63,10 +61,6 @@ public class Parser {
 			return Command.MakeAccusation;
 		}
 
-		else if (str.startsWith("select card")) {
-			return Command.SelectCard;
-		} 
-
 		else if (str.startsWith("secret passage")) {
 			return Command.SecretPassage;
 		}
@@ -81,10 +75,6 @@ public class Parser {
 
 		else if (str.startsWith("print locations")) {
 			return Command.PrintLocations;
-		}
-
-		else if (str.startsWith("print status")) {
-			return Command.PrintStatus;
 		}
 
 		else if (str.startsWith("print commands")) {

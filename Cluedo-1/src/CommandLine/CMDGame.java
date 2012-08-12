@@ -14,7 +14,13 @@ import CluedoGame.Room;
 import CluedoGame.Weapon;
 import CommandLine.Parser.Command;
 
-
+/**
+ * Represents a game of Cluedo played through the command line.
+ * Create a new CMDGame and a game will immediately begin.
+ * 
+ * @author Troy Shaw
+ *
+ */
 public class CMDGame {
 
 	//player currently taking turn
@@ -29,7 +35,12 @@ public class CMDGame {
 	public CMDGame() {
 		//construct the game object
 		System.out.println("Welcome to Cluedo!\n");
-		game = new CluedoGame(getNumberPlayers());
+		try {
+			game = new CluedoGame(getNumberPlayers());
+		} catch (Exception e) {
+			System.out.println("Error making game");
+			System.exit(-1);
+		}
 
 		//play a real game now
 		System.out.println("Starting a new game of Cluedo!");
@@ -359,7 +370,6 @@ public class CMDGame {
 		System.out.println("refute [card]\t-\tused to refute a murder suggestion");
 		System.out.println("secret passage\t-\tmoves the player through the secret passage");
 		System.out.println("end turn\t-\tends the current players turn");
-		System.out.println("print status\t-\tprints the current players status, their room, etc");
 		System.out.println("help\t-\tdisplays this help message");
 	}
 

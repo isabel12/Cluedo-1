@@ -3,6 +3,11 @@ package CluedoGame;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Enum represents a room in the cluedo game.
+ * @author Troy Shaw
+ *
+ */
 public enum Room implements Card {
 	DiningRoom("Dining room"),
 	GuestRoom("Guest room"),
@@ -25,6 +30,10 @@ public enum Room implements Card {
 		this.room = room;
 	}
 
+	/**
+	 * Returns the name of this room.
+	 * @return
+	 */
 	public String getName(){
 		return room;
 	}

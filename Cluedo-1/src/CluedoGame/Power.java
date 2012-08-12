@@ -56,11 +56,15 @@ public abstract class Power {
 		this.squareInvolved = squareInvolved;
 	}
 	
-	
+	/**
+	 * Returns the name of this Power.
+	 * @return
+	 */
 	public String getName(){
 		return this.name;
 	}
 	
+
 	public ActivationTime getActivationTime(){
 		return this.activation;
 	}
@@ -97,5 +101,4 @@ public abstract class Power {
 		AfterRollingAfterMove,
 		EndOfTurn;
 	}
-	
 }
